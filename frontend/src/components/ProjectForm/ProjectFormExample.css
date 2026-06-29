@@ -1,0 +1,140 @@
+.project-form-example {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b1220 0%, #07101a 50%, #0a1628 100%);
+  padding: 32px 20px;
+}
+
+.example-header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.example-header h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 12px 0;
+}
+
+.example-header p {
+  font-size: 16px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Success Alert */
+.success-alert {
+  max-width: 1200px;
+  margin: 20px auto 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  animation: slideInDown 0.4s ease-out;
+}
+
+.success-content {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.success-alert h3 {
+  color: #10b981;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.success-alert p {
+  color: #94a3b8;
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
+
+/* Error Alert */
+.error-alert {
+  max-width: 1200px;
+  margin: 20px auto 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  animation: slideInDown 0.4s ease-out;
+}
+
+.error-content {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.error-alert h3 {
+  color: #ef4444;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.error-alert p {
+  color: #94a3b8;
+  margin: 4px 0 0 0;
+  font-size: 14px;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .project-form-example {
+    padding: 20px 16px;
+  }
+
+  .example-header h1 {
+    font-size: 24px;
+  }
+
+  .example-header p {
+    font-size: 14px;
+  }
+}
