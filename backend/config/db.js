@@ -1,23 +1,25 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
 
 const connectDB = async () => {
+  const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+  if (!mongoUri) {
+    throw new Error('Missing MONGODB_URI or MONGO_URI environment variable. Configure MongoDB Atlas URI in Render Environment Variables.');
+  }
+
   try {
-    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
-
-    if (!mongoUri) {
-      throw new Error('Missing MONGO_URI/MONGODB_URI in backend/.env');
-    }
-
     const conn = await mongoose.connect(mongoUri, {
       dbName: process.env.DB_NAME || undefined,
       serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      maxPoolSize: 10,
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
+    console.log(`[backend] MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
+    return conn;
   } catch (err) {
-    console.error('Unable to connect to the database:', err.message);
-    process.exit(1);
+    console.error('[backend] Unable to connect to MongoDB Atlas:', err.message);
+    throw err;
   }
 };
 

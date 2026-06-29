@@ -4,8 +4,13 @@ const jwt = require('jsonwebtoken');
 const sendEmail = require('../config/nodemailer');
 const bcrypt = require('bcryptjs');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+if (!process.env.JWT_SECRET) {
+  console.warn('[backend] JWT_SECRET is not set. Using insecure fallback secret. Set JWT_SECRET in Render Environment Variables for production.');
+}
+
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
+  return jwt.sign({ id }, JWT_SECRET, {
     expiresIn: '30d',
   });
 };

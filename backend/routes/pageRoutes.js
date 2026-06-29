@@ -2,19 +2,19 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const { 
-  getPageContent, 
-  updatePageContent, 
-  uploadImage, 
-  getContentVersions, 
-  rollbackVersion 
+const {
+  getPageContent,
+  updatePageContent,
+  uploadImage,
+  getContentVersions,
+  rollbackVersion
 } = require('../controllers/pageController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 // Multer Storage Setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, path.join(__dirname, '..', 'uploads'));
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -30,8 +30,8 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ 
-  storage, 
+const upload = multer({
+  storage,
   fileFilter
   // limits: { fileSize: Infinity } // Unlimited file size as requested
 });
