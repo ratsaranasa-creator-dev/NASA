@@ -46,8 +46,13 @@
 }
 
 @keyframes floatOrb {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(60px, 60px) scale(1.1); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(60px, 60px) scale(1.1);
+  }
 }
 
 .signup-premium-container {
@@ -60,7 +65,7 @@
   -webkit-backdrop-filter: blur(24px);
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255,255,255,0.1);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
   position: relative;
   z-index: 1;
@@ -76,7 +81,7 @@
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
 }
 
 .signup-left-panel::after {
@@ -86,7 +91,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('../images/08.jpg') center/cover;
+  background-image: url('../images/08.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   opacity: 0.15;
   mix-blend-mode: overlay;
   z-index: 0;
@@ -103,15 +111,15 @@
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  border: 2px solid rgba(255,255,255,0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .signup-brand span {
   font-size: 1.7rem;
   font-weight: 800;
   letter-spacing: 1.5px;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .signup-welcome {
@@ -127,7 +135,7 @@
   background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+  text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .signup-welcome p {
@@ -157,12 +165,12 @@
   height: 48px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #6ee7b7;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .feature-item span {
@@ -188,7 +196,7 @@
   margin-bottom: 0.5rem;
 }
 
-.signup-right-panel > p {
+.signup-right-panel>p {
   color: #64748b;
   margin-bottom: 2rem;
   font-size: 1.05rem;
@@ -244,8 +252,8 @@
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
 }
 
-.input-group input:focus + .input-icon,
-.input-group input:not(:placeholder-shown) + .input-icon {
+.input-group input:focus+.input-icon,
+.input-group input:not(:placeholder-shown)+.input-icon {
   color: #10b981;
 }
 
@@ -276,7 +284,7 @@
   justify-content: center;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   position: relative;
 }
 
@@ -409,8 +417,13 @@
   border-bottom: 2px solid #f1f5f9;
 }
 
-.divider::before { margin-right: 1rem; }
-.divider::after { margin-left: 1rem; }
+.divider::before {
+  margin-right: 1rem;
+}
+
+.divider::after {
+  margin-left: 1rem;
+}
 
 .btn-google {
   background: white;
@@ -437,7 +450,7 @@
   background: #f8fafc;
   border-color: #cbd5e1;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .login-link {
@@ -488,7 +501,7 @@
     flex-direction: column;
     max-width: 600px;
   }
-  
+
   .signup-left-panel {
     padding: 3rem;
   }
@@ -496,7 +509,7 @@
   .signup-welcome h1 {
     font-size: 2.8rem;
   }
-  
+
   .signup-features {
     display: none;
   }
@@ -510,19 +523,19 @@
   .signup-premium-page {
     padding: 1rem;
   }
-  
+
   .signup-left-panel {
     padding: 2rem;
   }
-  
+
   .signup-brand span {
     font-size: 1.4rem;
   }
-  
+
   .signup-welcome h1 {
     font-size: 2.2rem;
   }
-  
+
   .signup-welcome p {
     font-size: 1rem;
   }
@@ -531,7 +544,7 @@
     flex-direction: column;
     gap: 1.25rem;
   }
-  
+
   .signup-right-panel {
     padding: 2rem 1.5rem;
   }
