@@ -12,8 +12,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
-const FRONTEND_URL = process.env.FRONTEND_URL || process.env.CLIENT_URL || true;
+const FRONTEND_URL = process.env.FRONTEND_URL || process.env.CLIENT_URL;
 const UPLOADS_PATH = path.join(__dirname, 'uploads');
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  FRONTEND_URL,
+];
 
 const log = (...messages) => console.log('[backend]', ...messages);
 
@@ -34,8 +39,29 @@ if (!fs.existsSync(UPLOADS_PATH)) {
   log('Created uploads directory at', UPLOADS_PATH);
 }
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (
+      allowedOrigins.includes(origin) ||
+      /https:\/\/.*\.vercel\.app$/.test(origin) ||
+      /https:\/\/.*\.vercel\.dev$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+
+    const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+    return callback(new Error(msg), false);
+  },
+  credentials: true,
+};
+
 // Middleware
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev'));

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Calendar, ArrowRight, X, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
-import bgImage from '../images/01.jpg'; 
+import bgImage from '../images/01.jpg';
 
 const ALL_CATEGORIES = ["Toutes", "Municipalité", "Travaux", "Événement", "Culture", "Santé"];
 
@@ -26,7 +26,7 @@ const Actualites = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState("Toutes");
   const [selectedArticle, setSelectedArticle] = useState(null);
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -34,7 +34,7 @@ const Actualites = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/news');
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/news`);
         setNews(data);
       } catch (error) {
         console.error('Error fetching news:', error);
@@ -46,8 +46,8 @@ const Actualites = () => {
   }, []);
 
   const filteredNews = news.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          item.desc.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.desc.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "Toutes" || item.category.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
@@ -63,7 +63,7 @@ const Actualites = () => {
   return (
     <div className="min-h-screen relative font-sans">
       {/* Full-screen Background Image */}
-      <div 
+      <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
@@ -72,7 +72,7 @@ const Actualites = () => {
 
       <div className="relative z-10 pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -87,7 +87,7 @@ const Actualites = () => {
         </motion.div>
 
         {/* Filters and Search */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -112,11 +112,10 @@ const Actualites = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 shadow-md ${
-                  selectedCategory === category
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 shadow-md ${selectedCategory === category
                     ? 'bg-primary text-white scale-105'
                     : 'bg-white/90 text-gray-700 hover:bg-white'
-                }`}
+                  }`}
               >
                 {category}
               </button>
@@ -153,9 +152,9 @@ const Actualites = () => {
                   className="bg-[#F8FAFC]/95 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-300 transform hover:-translate-y-2 group flex flex-col h-full"
                 >
                   <div className="relative h-56 md:h-64 overflow-hidden">
-                    <img 
-                      src={item.image.startsWith('http') || item.image.startsWith('data:') || (item.image.startsWith('/') && !item.image.startsWith('/uploads')) ? item.image : `http://localhost:5000${item.image}`} 
-                      alt={item.title} 
+                    <img
+                      src={item.image.startsWith('http') || item.image.startsWith('data:') || (item.image.startsWith('/') && !item.image.startsWith('/uploads')) ? item.image : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.image}`}
+                      alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
                     />
@@ -164,7 +163,7 @@ const Actualites = () => {
                       {item.date}
                     </div>
                   </div>
-                  
+
                   <div className="p-6 md:p-8 flex-1 flex flex-col">
                     <div className="mb-4">
                       <span className="inline-block bg-blue-100/70 text-blue-700 text-xs font-bold px-3 py-1 rounded-md tracking-wider">
@@ -177,7 +176,7 @@ const Actualites = () => {
                     <p className="text-gray-600 mb-6 flex-1 line-clamp-3">
                       {item.desc}
                     </p>
-                    <button 
+                    <button
                       onClick={() => setSelectedArticle(item)}
                       className="mt-auto inline-flex items-center text-[#8B1515] font-semibold hover:text-red-700 transition-colors w-max"
                     >
@@ -197,7 +196,7 @@ const Actualites = () => {
         {/* Pagination */}
         {!isLoading && totalPages > 1 && (
           <div className="mt-16 flex justify-center items-center gap-4">
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="p-2 rounded-full bg-white/90 text-gray-800 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all"
@@ -207,7 +206,7 @@ const Actualites = () => {
             <span className="text-white font-medium bg-black/40 px-4 py-1.5 rounded-full backdrop-blur-sm">
               Page {currentPage} sur {totalPages}
             </span>
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="p-2 rounded-full bg-white/90 text-gray-800 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all"
@@ -222,22 +221,22 @@ const Actualites = () => {
       <AnimatePresence>
         {selectedArticle && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setSelectedArticle(null)}
             />
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-y-auto flex flex-col z-10"
             >
-              <button 
+              <button
                 onClick={() => setSelectedArticle(null)}
                 className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-md transition-colors"
               >
@@ -245,9 +244,9 @@ const Actualites = () => {
               </button>
 
               <div className="relative h-64 sm:h-80 w-full shrink-0">
-                <img 
-                  src={selectedArticle.image.startsWith('http') || selectedArticle.image.startsWith('data:') || (selectedArticle.image.startsWith('/') && !selectedArticle.image.startsWith('/uploads')) ? selectedArticle.image : `http://localhost:5000${selectedArticle.image}`} 
-                  alt={selectedArticle.title} 
+                <img
+                  src={selectedArticle.image.startsWith('http') || selectedArticle.image.startsWith('data:') || (selectedArticle.image.startsWith('/') && !selectedArticle.image.startsWith('/uploads')) ? selectedArticle.image : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${selectedArticle.image}`}
+                  alt={selectedArticle.title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -271,9 +270,9 @@ const Actualites = () => {
                     <p key={i} className="mb-4">{paragraph}</p>
                   ))}
                 </div>
-                
+
                 <div className="mt-10 pt-6 border-t border-gray-200 flex justify-end">
-                  <button 
+                  <button
                     onClick={() => setSelectedArticle(null)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 px-6 rounded-xl transition-colors"
                   >

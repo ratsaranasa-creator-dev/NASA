@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MapPin, Calendar, TrendingUp, X, ArrowRight, 
-  Wallet, Clock, Users, Target, ChevronRight, Edit, Trash2, Share2, ChevronLeft 
+import {
+  MapPin, Calendar, TrendingUp, X, ArrowRight,
+  Wallet, Clock, Users, Target, ChevronRight, Edit, Trash2, Share2, ChevronLeft
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -181,7 +181,7 @@ export default function ProjectsPage() {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:5000/api/projects/${projectId}`, {
+        await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/projects/${projectId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         // Refresh projects list or remove from state
@@ -199,7 +199,7 @@ export default function ProjectsPage() {
   return (
     <div className="projects-page">
       {/* HERO SECTION */}
-      <section className="hero" style={{backgroundImage: `url(${heroImg})`}}>
+      <section className="hero" style={{ backgroundImage: `url(${heroImg})` }}>
         <div className="hero-overlay" />
         <div className="hero-particles">
           <div className="particle"></div>
@@ -246,10 +246,10 @@ export default function ProjectsPage() {
           <div className="filter-wrapper">
             <div className="search-box">
               <span className="search-icon">🔍</span>
-              <input 
-                placeholder="Rechercher un projet..." 
-                value={query} 
-                onChange={e => setQuery(e.target.value)} 
+              <input
+                placeholder="Rechercher un projet..."
+                value={query}
+                onChange={e => setQuery(e.target.value)}
                 className="search-input"
               />
             </div>
@@ -274,24 +274,24 @@ export default function ProjectsPage() {
           <h2>Tous les projets</h2>
           <p>Explorez les initiatives qui transforment notre commune</p>
         </div>
-        
+
         {filtered.length > 0 ? (
           <div className="projects-grid">
             {filtered.map(p => (
               <article key={p.id} className="project-card" data-state={p.state}>
                 <div className="card-image-wrapper">
-                  <div className="card-image" style={{backgroundImage: `url(${p.img})`}}>
+                  <div className="card-image" style={{ backgroundImage: `url(${p.img})` }}>
                     <div className="image-overlay"></div>
                   </div>
                   <span className={`state-badge state-${p.state.toLowerCase().replace(' ', '-')}`}>
                     {p.state}
                   </span>
                 </div>
-                
+
                 <div className="card-content">
                   <h3 className="card-title">{p.title}</h3>
                   <p className="card-description">{p.desc}</p>
-                  
+
                   {p.progress > 0 && (
                     <div className="progress-container">
                       <div className="progress-label">
@@ -299,11 +299,11 @@ export default function ProjectsPage() {
                         <span className="progress-value">{p.progress}%</span>
                       </div>
                       <div className="progress-bar">
-                        <div className="progress-fill" style={{width: `${p.progress}%`}}></div>
+                        <div className="progress-fill" style={{ width: `${p.progress}%` }}></div>
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="card-footer">
                     <div className="card-meta">
                       <span className="category-tag">{p.category}</span>
@@ -311,7 +311,7 @@ export default function ProjectsPage() {
                     </div>
                     <span className="budget-badge">{p.budget}</span>
                   </div>
-                  
+
                   <button className="card-button" onClick={() => setSelectedProject(p)}>
                     Voir les détails <ArrowRight size={16} />
                   </button>
@@ -334,7 +334,7 @@ export default function ProjectsPage() {
       <AnimatePresence>
         {selectedProject && (
           <div className="project-detail-overlay" onClick={() => setSelectedProject(null)}>
-            <motion.div 
+            <motion.div
               className="project-detail-modal"
               initial={{ opacity: 0, y: 60, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -349,16 +349,16 @@ export default function ProjectsPage() {
 
               {/* Navigation Buttons */}
               <div className="detail-navigation">
-                <button 
-                  className="nav-btn prev" 
-                  onClick={goToPreviousProject} 
+                <button
+                  className="nav-btn prev"
+                  onClick={goToPreviousProject}
                   disabled={filtered.indexOf(selectedProject) === 0}
                 >
                   <ChevronLeft size={24} />
                 </button>
-                <button 
-                  className="nav-btn next" 
-                  onClick={goToNextProject} 
+                <button
+                  className="nav-btn next"
+                  onClick={goToNextProject}
                   disabled={filtered.indexOf(selectedProject) === filtered.length - 1}
                 >
                   <ChevronRight size={24} />
@@ -429,8 +429,8 @@ export default function ProjectsPage() {
                   <div className="detail-section-content">
                     <div className="detail-objectives">
                       {selectedProject.objectives.map((obj, idx) => (
-                        <motion.div 
-                          key={idx} 
+                        <motion.div
+                          key={idx}
                           className="objective-item"
                           initial={{ opacity: 0, x: -15 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -454,7 +454,7 @@ export default function ProjectsPage() {
                         <span className="detail-progress-pct">{selectedProject.progress}%</span>
                       </div>
                       <div className="detail-progress-bar">
-                        <motion.div 
+                        <motion.div
                           className="detail-progress-fill"
                           initial={{ width: 0 }}
                           animate={{ width: `${selectedProject.progress}%` }}
@@ -471,8 +471,8 @@ export default function ProjectsPage() {
                   <div className="detail-section-content">
                     <div className="detail-timeline">
                       {selectedProject.timeline.map((t, idx) => (
-                        <motion.div 
-                          key={idx} 
+                        <motion.div
+                          key={idx}
                           className={`timeline-step ${t.done ? 'done' : ''}`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -518,14 +518,14 @@ export default function ProjectsPage() {
       {/* FEATURED PROJECT */}
       <section className="featured-project">
         <div className="featured-container">
-          <div className="featured-image" style={{backgroundImage: `url(${img3})`}}>
+          <div className="featured-image" style={{ backgroundImage: `url(${img3})` }}>
             <div className="featured-overlay"></div>
             <div className="featured-badge">🌟 PROJET PHARE</div>
           </div>
           <div className="featured-content">
             <h2>Développement du centre-ville</h2>
             <p className="featured-description">Un projet ambitieux pour moderniser, embellir et dynamiser le cœur de notre commune avec des espaces verts innovants, des commerces modernes, et des infrastructures de qualité.</p>
-            
+
             <div className="featured-stats">
               <div className="featured-stat">
                 <span className="stat-label">Budget</span>
@@ -540,17 +540,17 @@ export default function ProjectsPage() {
                 <span className="stat-value">10K+</span>
               </div>
             </div>
-            
+
             <div className="featured-progress">
               <div className="progress-header">
                 <span>Avancement du projet</span>
                 <span className="progress-percentage">70%</span>
               </div>
               <div className="progress-bar large">
-                <div className="progress-fill" style={{width: '70%'}}></div>
+                <div className="progress-fill" style={{ width: '70%' }}></div>
               </div>
             </div>
-            
+
             <button className="btn primary-btn" onClick={() => setSelectedProject(sampleProjects[2])}>
               <span>Découvrir le projet →</span>
             </button>
@@ -582,10 +582,10 @@ export default function ProjectsPage() {
       <section className="gallery">
         <h3>Suivi en images</h3>
         <div className="gallery-row">
-          <div className="img" style={{backgroundImage: `url(${img1})`}} />
-          <div className="img" style={{backgroundImage: `url(${img2})`}} />
-          <div className="img" style={{backgroundImage: `url(${img3})`}} />
-          <div className="img" style={{backgroundImage: `url(${img4})`}} />
+          <div className="img" style={{ backgroundImage: `url(${img1})` }} />
+          <div className="img" style={{ backgroundImage: `url(${img2})` }} />
+          <div className="img" style={{ backgroundImage: `url(${img3})` }} />
+          <div className="img" style={{ backgroundImage: `url(${img4})` }} />
         </div>
       </section>
 
@@ -602,9 +602,9 @@ export default function ProjectsPage() {
       <section className="timeline">
         <h3>Nos grandes réalisations</h3>
         <div className="timeline-list">
-          <div className="item"><div className="dot"/> <div className="content"><strong>2024</strong> Réhabilitation de la route principale</div></div>
-          <div className="item"><div className="dot"/> <div className="content"><strong>2022</strong> Construction de l'école primaire</div></div>
-          <div className="item"><div className="dot"/> <div className="content"><strong>2021</strong> Aménagement de parcs et jardins</div></div>
+          <div className="item"><div className="dot" /> <div className="content"><strong>2024</strong> Réhabilitation de la route principale</div></div>
+          <div className="item"><div className="dot" /> <div className="content"><strong>2022</strong> Construction de l'école primaire</div></div>
+          <div className="item"><div className="dot" /> <div className="content"><strong>2021</strong> Aménagement de parcs et jardins</div></div>
         </div>
       </section>
 
@@ -622,12 +622,12 @@ export default function ProjectsPage() {
         <h3>Questions fréquentes</h3>
         <div className="faq-list">
           {[
-            {q: 'Comment suivre l\'avancement d\'un projet ?', a: 'Chaque projet dispose d\'une page dédiée avec son état et ses documents.'},
-            {q: 'Comment signaler un problème dans ma quartier ?', a: 'Contactez la mairie via la page contact ou utilisez l\'option participer.'}
-          ].map((f,i)=> (
-            <div key={i} className={`faq-item ${openFaq===i? 'open':''}`} onClick={()=> setOpenFaq(openFaq===i? null:i)}>
+            { q: 'Comment suivre l\'avancement d\'un projet ?', a: 'Chaque projet dispose d\'une page dédiée avec son état et ses documents.' },
+            { q: 'Comment signaler un problème dans ma quartier ?', a: 'Contactez la mairie via la page contact ou utilisez l\'option participer.' }
+          ].map((f, i) => (
+            <div key={i} className={`faq-item ${openFaq === i ? 'open' : ''}`} onClick={() => setOpenFaq(openFaq === i ? null : i)}>
               <div className="q">{f.q}</div>
-              <div className="a">{openFaq===i? f.a : ''}</div>
+              <div className="a">{openFaq === i ? f.a : ''}</div>
             </div>
           ))}
         </div>

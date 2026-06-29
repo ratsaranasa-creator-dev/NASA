@@ -1,13 +1,10 @@
 const mongoose = require('mongoose');
 
-// Default Atlas connection (used only if no env var is set)
-const DEFAULT_ATLAS_URI = 'mongodb://ac-u8ouxbz-shard-00-01.ppsupn2.mongodb.net,ac-u8ouxbz-shard-00-00.ppsupn2.mongodb.net,ac-u8ouxbz-shard-00-02.ppsupn2.mongodb.net/?tls=true&authMechanism=MONGODB-X509&authSource=%24external&maxIdleTimeMS=45000&minPoolSize=0&replicaSet=atlas-puq8s0-shard-0&compressors=zlib';
-
 const connectDB = async () => {
-  const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || DEFAULT_ATLAS_URI;
+  const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
 
-  if (!process.env.MONGODB_URI && !process.env.MONGO_URI) {
-    console.warn('[backend] No MONGODB_URI or MONGO_URI env var found. Falling back to provided DEFAULT_ATLAS_URI.');
+  if (!mongoUri) {
+    throw new Error('Missing MONGODB_URI or MONGO_URI environment variable. Configure MongoDB Atlas URI in Render Environment Variables.');
   }
 
   try {
@@ -22,7 +19,6 @@ const connectDB = async () => {
     return conn;
   } catch (err) {
     console.error('[backend] Unable to connect to MongoDB Atlas:', err.message);
-    console.error('[backend] Tried URI:', mongoUri.substring(0, 80) + '...');
     throw err;
   }
 };

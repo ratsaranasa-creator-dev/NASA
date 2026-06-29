@@ -18,7 +18,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('http://localhost:5000/api/admin/users', config);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/users`, config);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -45,14 +45,14 @@ const AdminUsers = ({ onRefreshNotification }) => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      await axios.put(`http://localhost:5000/api/admin/citizen-status/${userId}`, {
+
+      await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/citizen-status/${userId}`, {
         status: newStatus
       }, config);
 
       // Update local state list
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
-      
+
       // Notify parent component to update pending notifications badge
       if (onRefreshNotification) {
         onRefreshNotification();
@@ -68,10 +68,10 @@ const AdminUsers = ({ onRefreshNotification }) => {
 
   // 4. Filtering and Sorting logic
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch =
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
 
@@ -116,9 +116,9 @@ const AdminUsers = ({ onRefreshNotification }) => {
       <div className="users-controls-bar">
         <div className="search-box">
           <Search size={18} />
-          <input 
-            type="text" 
-            placeholder="Rechercher par nom, prénom ou email..." 
+          <input
+            type="text"
+            placeholder="Rechercher par nom, prénom ou email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -186,7 +186,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
                       <td className="user-name-cell">
                         <div className="avatar-placeholder">
                           {user.profilePicture ? (
-                            <img src={`http://localhost:5000${user.profilePicture}`} alt={fullName} className="avatar-img" />
+                            <img src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${user.profilePicture}`} alt={fullName} className="avatar-img" />
                           ) : (
                             <>{user.firstName[0] || ''}{user.lastName[0] || ''}</>
                           )}
@@ -211,7 +211,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
                         ) : (
                           <div className="action-buttons-group">
                             {user.status !== 'APPROVED' && (
-                              <button 
+                              <button
                                 className="btn-table-action approve"
                                 onClick={() => handleUpdateStatus(user.id, 'APPROVED', fullName)}
                                 title="Approuver l'utilisateur"
@@ -219,9 +219,9 @@ const AdminUsers = ({ onRefreshNotification }) => {
                                 <Check size={16} /> Approuver
                               </button>
                             )}
-                            
+
                             {user.status !== 'REJECTED' && (
-                              <button 
+                              <button
                                 className="btn-table-action reject"
                                 onClick={() => handleUpdateStatus(user.id, 'REJECTED', fullName)}
                                 title="Rejeter/Bloquer l'utilisateur"

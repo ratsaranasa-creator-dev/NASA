@@ -13,7 +13,7 @@ const VersionHistory = ({ contentId, onRollback, onClose }) => {
         const config = {
           headers: { Authorization: `Bearer ${token}` }
         };
-        const { data } = await axios.get(`http://localhost:5000/api/pages/versions/${contentId}`, config);
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/versions/${contentId}`, config);
         setVersions(data);
       } catch (error) {
         console.error('Error fetching versions:', error);
@@ -32,7 +32,7 @@ const VersionHistory = ({ contentId, onRollback, onClose }) => {
         const config = {
           headers: { Authorization: `Bearer ${token}` }
         };
-        const { data } = await axios.post(`http://localhost:5000/api/pages/rollback/${versionId}`, {}, config);
+        const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/rollback/${versionId}`, {}, config);
         onRollback(data);
       } catch (error) {
         alert('Erreur lors de la restauration');

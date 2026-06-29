@@ -20,7 +20,7 @@ const ProjectComments = ({ projectId }) => {
   const fetchComments = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/comments/project/${projectId}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/comments/project/${projectId}`);
       setComments(data);
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -71,8 +71,8 @@ const ProjectComments = ({ projectId }) => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      const { data } = await axios.post('http://localhost:5000/api/comments', {
+
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/comments`, {
         content: newCommentContent,
         projectId
       }, config);
@@ -96,8 +96,8 @@ const ProjectComments = ({ projectId }) => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      const { data } = await axios.post('http://localhost:5000/api/comments', {
+
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/comments`, {
         content: replyContent,
         projectId,
         parentId
@@ -121,13 +121,13 @@ const ProjectComments = ({ projectId }) => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      await axios.delete(`http://localhost:5000/api/comments/${commentId}`, config);
-      
+
+      await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/comments/${commentId}`, config);
+
       // Remove deleted comment and all of its recursive children from local state
       setComments(prev => {
         const toDeleteIds = new Set([commentId]);
-        
+
         // Find children and subchildren to delete from local state array
         let lengthChanged = true;
         while (lengthChanged) {
@@ -166,9 +166,9 @@ const ProjectComments = ({ projectId }) => {
     const initials = `${comment.author?.firstName?.charAt(0) || ''}${comment.author?.lastName?.charAt(0) || ''}`.toUpperCase();
 
     return (
-      <motion.div 
-        key={comment.id} 
-        className="comment-node" 
+      <motion.div
+        key={comment.id}
+        className="comment-node"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -196,8 +196,8 @@ const ProjectComments = ({ projectId }) => {
 
           <div className="comment-actions">
             {canPost && (
-              <button 
-                className="btn-action-reply" 
+              <button
+                className="btn-action-reply"
                 onClick={() => {
                   setActiveReplyId(activeReplyId === comment.id ? null : comment.id);
                   setReplyContent('');
@@ -218,8 +218,8 @@ const ProjectComments = ({ projectId }) => {
         {/* Inline Reply Input */}
         <AnimatePresence>
           {activeReplyId === comment.id && (
-            <motion.form 
-              className="comment-reply-form" 
+            <motion.form
+              className="comment-reply-form"
               onSubmit={(e) => handlePostReply(e, comment.id)}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -267,7 +267,7 @@ const ProjectComments = ({ projectId }) => {
       </div>
 
       {errorMsg && (
-        <motion.div 
+        <motion.div
           className="comment-error-alert"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -294,7 +294,7 @@ const ProjectComments = ({ projectId }) => {
               <div className="form-footer">
                 <span className="char-count">{newCommentContent.length} / 500</span>
                 <button type="submit" className="btn-submit-comment" disabled={submitting || !newCommentContent.trim()}>
-                  <Send size={16} /> 
+                  <Send size={16} />
                   <span>{submitting ? 'Publication...' : 'Publier le commentaire'}</span>
                 </button>
               </div>
@@ -330,7 +330,7 @@ const ProjectComments = ({ projectId }) => {
         ) : (
           <div className="comments-tree-container">
             {commentTree.length === 0 ? (
-              <motion.div 
+              <motion.div
                 className="no-comments-msg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

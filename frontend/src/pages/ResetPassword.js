@@ -61,7 +61,7 @@ const ResetPassword = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/auth/resetpassword/${token}`, { password });
+      await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/reset-password/${token}`, { password });
       setMessage('Votre mot de passe a été réinitialisé avec succès ! Redirection vers la page de connexion...');
       setPassword('');
       setConfirmPassword('');
@@ -75,7 +75,7 @@ const ResetPassword = () => {
 
   return (
     <div className="auth-page auth-page-v2">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="auth-card auth-card-v2"
@@ -94,30 +94,30 @@ const ResetPassword = () => {
         <div className="auth-right-panel">
           <form onSubmit={handleSubmit} className="auth-form auth-form-v2">
             <h3>Nouveau mot de passe</h3>
-            
+
             {error && <div className="auth-error">{error}</div>}
             {message && <div className="auth-success">{message}</div>}
-            
+
             <div className="form-group">
               <div style={{ position: 'relative' }}>
-                <input 
-                  type={showPassword ? 'text' : 'password'} 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  required 
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   placeholder="Nouveau mot de passe"
                   disabled={loading}
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)} 
-                  style={{ 
-                    position: 'absolute', 
-                    right: '10px', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)', 
-                    background: 'none', 
-                    border: 'none', 
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
                     cursor: 'pointer',
                     color: '#6b7280'
                   }}
@@ -129,24 +129,24 @@ const ResetPassword = () => {
 
             <div className="form-group">
               <div style={{ position: 'relative' }}>
-                <input 
-                  type={showConfirmPassword ? 'text' : 'password'} 
-                  value={confirmPassword} 
-                  onChange={(e) => setConfirmPassword(e.target.value)} 
-                  required 
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                   placeholder="Confirmer le mot de passe"
                   disabled={loading}
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
-                  style={{ 
-                    position: 'absolute', 
-                    right: '10px', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)', 
-                    background: 'none', 
-                    border: 'none', 
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
                     cursor: 'pointer',
                     color: '#6b7280'
                   }}

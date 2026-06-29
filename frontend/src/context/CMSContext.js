@@ -13,7 +13,7 @@ export const CMSProvider = ({ children }) => {
   const fetchPageContent = useCallback(async (pageName) => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/pages/${pageName}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/${pageName}`);
       const contentMap = {};
       data.forEach(item => {
         contentMap[item.sectionKey] = item;
@@ -35,7 +35,7 @@ export const CMSProvider = ({ children }) => {
     };
 
     try {
-      const { data } = await axios.put('http://localhost:5000/api/pages/content', {
+      const { data } = await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/content`, {
         pageName,
         sectionKey,
         contentValue,
@@ -70,7 +70,7 @@ export const CMSProvider = ({ children }) => {
     };
 
     try {
-      const { data } = await axios.post('http://localhost:5000/api/pages/upload', formData, config);
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/upload`, formData, config);
       return data.url;
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -85,14 +85,14 @@ export const CMSProvider = ({ children }) => {
   };
 
   return (
-    <CMSContext.Provider value={{ 
-      isEditMode, 
-      toggleEditMode, 
-      pageContent, 
-      fetchPageContent, 
-      updateContent, 
+    <CMSContext.Provider value={{
+      isEditMode,
+      toggleEditMode,
+      pageContent,
+      fetchPageContent,
+      updateContent,
       uploadImage,
-      loading 
+      loading
     }}>
       {children}
     </CMSContext.Provider>

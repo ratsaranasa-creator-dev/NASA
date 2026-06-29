@@ -15,7 +15,7 @@ import '../styles/ProjectPage.css';
 
 const faqData = [
   {
-    q: "Comment puis-je suivre l'avancement d'un projet ?" ,
+    q: "Comment puis-je suivre l'avancement d'un projet ?",
     a: "Chaque projet dispose d'une page détaillée accessible via le bouton 'Voir détail'. Vous y trouverez les dates clés, le taux d'avancement et les dernières mises à jour publiées par la mairie."
   },
   {
@@ -83,7 +83,7 @@ const Project = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/projects');
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/projects`);
         setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -111,12 +111,12 @@ const Project = () => {
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
       return imagePath;
     }
-    return `http://localhost:5000${imagePath}`;
+    return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${imagePath}`;
   };
 
   const filteredProjects = projects.filter(project => {
     const matchesCategory = filterCategory === 'all' || project.category === filterCategory;
-    
+
     // Normalize status for comparisons
     const statusMap = {
       'encours': 'en cours',
@@ -125,7 +125,7 @@ const Project = () => {
     };
     const targetStatus = statusMap[filterStatus] || filterStatus;
     const matchesStatus = filterStatus === 'all' || project.status.toLowerCase() === targetStatus.toLowerCase();
-    
+
     return matchesCategory && matchesStatus;
   });
 
@@ -391,8 +391,8 @@ const Project = () => {
                 </div>
                 <h3>Infrastructures</h3>
                 <p>
-                  Routes, ponts, réseaux d'eau potable, assainissement, électrification des quartiers — 
-                  nous modernisons les équipements structurants de la commune pour garantir un accès équitable 
+                  Routes, ponts, réseaux d'eau potable, assainissement, électrification des quartiers —
+                  nous modernisons les équipements structurants de la commune pour garantir un accès équitable
                   aux services essentiels.
                 </p>
                 <ul className="theme-examples">
@@ -410,7 +410,7 @@ const Project = () => {
                 </div>
                 <h3>Éducation</h3>
                 <p>
-                  Construction et rénovation d'écoles, équipements numériques, soutien aux activités 
+                  Construction et rénovation d'écoles, équipements numériques, soutien aux activités
                   périscolaires — l'éducation est au cœur de notre vision pour l'avenir de Dembéni.
                 </p>
                 <ul className="theme-examples">
@@ -428,7 +428,7 @@ const Project = () => {
                 </div>
                 <h3>Environnement</h3>
                 <p>
-                  Protection des espaces naturels, gestion des déchets, développement des espaces verts 
+                  Protection des espaces naturels, gestion des déchets, développement des espaces verts
                   et promotion des énergies renouvelables pour un cadre de vie durable.
                 </p>
                 <ul className="theme-examples">
@@ -446,7 +446,7 @@ const Project = () => {
                 </div>
                 <h3>Social &amp; Cohésion</h3>
                 <p>
-                  Centres communautaires, équipements sportifs, soutien aux personnes vulnérables — 
+                  Centres communautaires, équipements sportifs, soutien aux personnes vulnérables —
                   nous bâtissons une commune solidaire où chaque habitant trouve sa place.
                 </p>
                 <ul className="theme-examples">
@@ -644,7 +644,7 @@ const Project = () => {
             <button className="btn-close-modal-detail" onClick={() => setSelectedProject(null)}>
               <X size={20} />
             </button>
-            
+
             <div className="modal-header-image">
               <img src={getImageUrl(selectedProject.image)} alt={selectedProject.title} />
               <span className={`status-tag-v3 ${selectedProject.status.toLowerCase().replace(' ', '-')}`}>
@@ -655,7 +655,7 @@ const Project = () => {
             <div className="modal-body-content">
               <span className="modal-category-tag">{selectedProject.category}</span>
               <h2>{selectedProject.title}</h2>
-              
+
               <div className="modal-meta-grid">
                 <div className="meta-card">
                   <span className="meta-label">📍 Localisation</span>

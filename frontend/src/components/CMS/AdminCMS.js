@@ -14,7 +14,7 @@ const AdminCMS = () => {
   const fetchContent = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/pages/${selectedPage}`);
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/${selectedPage}`);
       setPageContent(data);
     } catch (error) {
       console.error('Error fetching page content:', error);
@@ -53,8 +53,8 @@ const AdminCMS = () => {
       <div className="cms-page-selector">
         <div className="page-tabs">
           {pages.map(page => (
-            <button 
-              key={page} 
+            <button
+              key={page}
               className={`page-tab ${selectedPage === page ? 'active' : ''}`}
               onClick={() => setSelectedPage(page)}
             >
@@ -75,13 +75,13 @@ const AdminCMS = () => {
             {editingItem?.isNew && (
               <div className="cms-item-card new-item">
                 <div className="item-header">
-                  <input 
-                    placeholder="Clé de la section (ex: hero_title)" 
+                  <input
+                    placeholder="Clé de la section (ex: hero_title)"
                     className="input-key-new"
                     value={editingItem.sectionKey}
                     onChange={(e) => setEditingItem({ ...editingItem, sectionKey: e.target.value })}
                   />
-                  <select 
+                  <select
                     value={editingItem.contentType}
                     onChange={(e) => setEditingItem({ ...editingItem, contentType: e.target.value })}
                   >
@@ -91,8 +91,8 @@ const AdminCMS = () => {
                   </select>
                 </div>
                 <div className="item-body">
-                  <textarea 
-                    placeholder="Contenu..." 
+                  <textarea
+                    placeholder="Contenu..."
                     className="cms-textarea"
                     value={editingItem.contentValue}
                     onChange={(e) => setEditingItem({ ...editingItem, contentValue: e.target.value })}
@@ -106,7 +106,7 @@ const AdminCMS = () => {
                 </div>
               </div>
             )}
-            
+
             <div className="cms-items-grid">
               {pageContent.map(item => (
                 <div key={item.id} className="cms-item-card">
@@ -114,18 +114,18 @@ const AdminCMS = () => {
                     <span className="item-key">{item.sectionKey}</span>
                     <span className={`item-type type-${item.contentType}`}>{item.contentType}</span>
                   </div>
-                  
+
                   <div className="item-body">
                     {item.contentType === 'image' ? (
                       <div className="image-preview-admin">
-                        <img src={item.contentValue.startsWith('http') ? item.contentValue : `http://localhost:5000${item.contentValue}`} alt="" />
+                        <img src={item.contentValue.startsWith('http') ? item.contentValue : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.contentValue}`} alt="" />
                         <label className="btn-change-image">
                           <ImageIcon size={16} /> Remplacer
                           <input type="file" onChange={(e) => handleFileChange(item, e.target.files[0])} style={{ display: 'none' }} />
                         </label>
                       </div>
                     ) : (
-                      <textarea 
+                      <textarea
                         value={editingItem?.id === item.id ? editingItem.contentValue : item.contentValue}
                         onChange={(e) => setEditingItem({ ...item, contentValue: e.target.value })}
                         onFocus={() => setEditingItem(item)}

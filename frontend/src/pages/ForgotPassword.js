@@ -30,9 +30,9 @@ const ForgotPassword = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/auth/forgotpassword', { email });
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/forgot-password`, { email });
       setMessage('Si votre adresse e-mail est enregistrée, un lien de réinitialisation vous a été envoyé.');
-      setEmail(''); 
+      setEmail('');
     } catch (err) {
       setError(err.response?.data?.message || 'Une erreur est survenue lors de la demande de réinitialisation. Veuillez réessayer.');
     } finally {
@@ -42,8 +42,8 @@ const ForgotPassword = () => {
 
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: { duration: 0.5, ease: "easeOut", staggerChildren: 0.1 }
     }
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="signup-premium-page">
-      <motion.div 
+      <motion.div
         className="signup-premium-container"
         variants={containerVariants}
         initial="hidden"
@@ -68,9 +68,9 @@ const ForgotPassword = () => {
             <img src={logo} alt="Dembéni Logo" />
             <span>DEMBENI</span>
           </motion.div>
-          
+
           <motion.div className="signup-welcome" variants={itemVariants}>
-            <h1>Mot de passe<br/>oublié ?</h1>
+            <h1>Mot de passe<br />oublié ?</h1>
             <p>Pas de panique ! Entrez votre adresse e-mail et nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.</p>
           </motion.div>
 
@@ -93,9 +93,9 @@ const ForgotPassword = () => {
 
           <AnimatePresence>
             {error && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }} 
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
                 className="message error"
               >
@@ -104,9 +104,9 @@ const ForgotPassword = () => {
               </motion.div>
             )}
             {message && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
-                animate={{ opacity: 1, y: 0 }} 
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, height: 0 }}
                 className="message success"
               >
@@ -117,14 +117,14 @@ const ForgotPassword = () => {
           </AnimatePresence>
 
           <motion.form onSubmit={handleSubmit} className="signup-form" variants={itemVariants}>
-            
+
             <div className="input-group">
               <Mail className="input-icon" size={20} />
-              <input 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 placeholder="Votre adresse email"
                 disabled={loading}
               />

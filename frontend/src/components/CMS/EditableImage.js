@@ -6,7 +6,7 @@ const EditableImage = ({ pageName, sectionKey, defaultSrc, className = '', alt =
   const { isEditMode, pageContent, updateContent, uploadImage, fetchPageContent } = useCMS();
 
   const content = pageContent[pageName]?.[sectionKey];
-  const currentSrc = content ? (content.contentValue.startsWith('http') ? content.contentValue : `http://localhost:5000${content.contentValue}`) : defaultSrc;
+  const currentSrc = content ? (content.contentValue.startsWith('http') ? content.contentValue : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${content.contentValue}`) : defaultSrc;
 
   useEffect(() => {
     if (!pageContent[pageName]) {

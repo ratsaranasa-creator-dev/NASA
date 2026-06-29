@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, CheckCircle, ArrowRight, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import '../styles/ForgotPassword.css';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth`;
 
 const EmailStep = ({ onEmailSubmit, loading, error }) => {
   const [email, setEmail] = useState('');

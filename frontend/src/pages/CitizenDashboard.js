@@ -16,16 +16,16 @@ const CitizenDashboard = () => {
     doc.text('Mairie de Dembéni', 105, 20, { align: 'center' });
     doc.setFontSize(16);
     doc.text('Attestation de Citoyenneté', 105, 40, { align: 'center' });
-    
+
     doc.setFontSize(12);
     doc.text(`Nom: ${user.lastName}`, 20, 60);
     doc.text(`Prénom: ${user.firstName}`, 20, 70);
     doc.text(`Email: ${user.email}`, 20, 80);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 90);
-    
+
     doc.text('Ce document atteste que la personne susnommée est enregistrée', 20, 110);
     doc.text('en tant que citoyen dans le portail numérique de la Mairie de Dembéni.', 20, 120);
-    
+
     doc.save(`Attestation_${user.lastName}.pdf`);
   };
 
@@ -35,7 +35,7 @@ const CitizenDashboard = () => {
     setMessage('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/citizen/request', 
+      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/citizen/request`,
         { content: request },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -78,7 +78,7 @@ const CitizenDashboard = () => {
               <h3>Nouvelle Demande</h3>
             </div>
             <form onSubmit={handleSubmitRequest}>
-              <textarea 
+              <textarea
                 placeholder="Décrivez votre demande ici..."
                 value={request}
                 onChange={(e) => setRequest(e.target.value)}

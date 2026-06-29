@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const fetchPendingCitizens = async () => {
     try {
       const token = localStorage.getItem('token');
-      const { data } = await axios.get('http://localhost:5000/api/admin/pending-citizens', {
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/pending-citizens`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingCitizens(data);
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
   const handleStatusUpdate = async (id, status) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/admin/citizen-status/${id}`, 
+      await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/citizen-status/${id}`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -63,8 +63,8 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <div 
-        className={`sidebar-overlay ${mobileMenuOpen ? 'show' : ''}`} 
+      <div
+        className={`sidebar-overlay ${mobileMenuOpen ? 'show' : ''}`}
         onClick={() => setMobileMenuOpen(false)}
       ></div>
 
@@ -74,50 +74,50 @@ const AdminDashboard = () => {
           <h3>Espace Admin</h3>
         </div>
         <nav className="sidebar-nav">
-          <button 
-            className={activeTab === 'pending' ? 'active' : ''} 
+          <button
+            className={activeTab === 'pending' ? 'active' : ''}
             onClick={() => setActiveTab('pending')}
           >
             <UserCheck size={20} /> Citoyens en attente
           </button>
-          <button 
-            className={activeTab === 'users' ? 'active' : ''} 
+          <button
+            className={activeTab === 'users' ? 'active' : ''}
             onClick={() => setActiveTab('users')}
           >
             <Users size={20} /> Gestion des Comptes
           </button>
-          <button 
-            className={activeTab === 'cms' ? 'active' : ''} 
+          <button
+            className={activeTab === 'cms' ? 'active' : ''}
             onClick={() => setActiveTab('cms')}
           >
             <Layout size={20} /> Gestion du Contenu
           </button>
-          <button 
-            className={activeTab === 'projects' ? 'active' : ''} 
+          <button
+            className={activeTab === 'projects' ? 'active' : ''}
             onClick={() => setActiveTab('projects')}
           >
             <Folder size={20} /> Gestion des Projets
           </button>
-          <button 
-            className={activeTab === 'actualites' ? 'active' : ''} 
+          <button
+            className={activeTab === 'actualites' ? 'active' : ''}
             onClick={() => setActiveTab('actualites')}
           >
             <Newspaper size={20} /> Gestion des Actualités
           </button>
-          <button 
-            className={activeTab === 'demarches' ? 'active' : ''} 
+          <button
+            className={activeTab === 'demarches' ? 'active' : ''}
             onClick={() => setActiveTab('demarches')}
           >
             <FileText size={20} /> Gestion des Démarches
           </button>
-          <button 
-            className={activeTab === 'culture' ? 'active' : ''} 
+          <button
+            className={activeTab === 'culture' ? 'active' : ''}
             onClick={() => setActiveTab('culture')}
           >
             <MapPin size={20} /> Culture & Sport
           </button>
-          <button 
-            className={activeTab === 'history' ? 'active' : ''} 
+          <button
+            className={activeTab === 'history' ? 'active' : ''}
             onClick={() => setActiveTab('history')}
           >
             <Clock size={20} /> Historique
@@ -138,40 +138,40 @@ const AdminDashboard = () => {
                 <div className="loader">Chargement...</div>
               ) : (
                 <div className="citizen-grid">
-                   {pendingCitizens.length === 0 ? (
-                     <p className="no-data">Aucune demande en attente.</p>
-                   ) : (
-                     pendingCitizens.map((citizen, idx) => (
-                       <motion.div 
-                         key={citizen.id} 
-                         className="citizen-card"
-                         initial={{ opacity: 0, scale: 0.95 }}
-                         animate={{ opacity: 1, scale: 1 }}
-                         transition={{ delay: idx * 0.1, duration: 0.3 }}
-                       >
-                         <div className="citizen-info">
-                           <h4>{citizen.firstName} {citizen.lastName}</h4>
-                           <p>{citizen.email}</p>
-                           <span className="status-badge pending">EN ATTENTE</span>
-                         </div>
-                         <div className="citizen-actions">
-                           <button 
-                             onClick={() => handleStatusUpdate(citizen.id, 'APPROVED')}
-                             className="btn-approve"
-                           >
-                             <Check size={20} /> Accepter
-                           </button>
-                           <button 
-                             onClick={() => handleStatusUpdate(citizen.id, 'REJECTED')}
-                             className="btn-reject"
-                           >
-                             <X size={20} /> Refuser
-                           </button>
-                         </div>
-                       </motion.div>
-                     ))
-                   )}
-                 </div>
+                  {pendingCitizens.length === 0 ? (
+                    <p className="no-data">Aucune demande en attente.</p>
+                  ) : (
+                    pendingCitizens.map((citizen, idx) => (
+                      <motion.div
+                        key={citizen.id}
+                        className="citizen-card"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.1, duration: 0.3 }}
+                      >
+                        <div className="citizen-info">
+                          <h4>{citizen.firstName} {citizen.lastName}</h4>
+                          <p>{citizen.email}</p>
+                          <span className="status-badge pending">EN ATTENTE</span>
+                        </div>
+                        <div className="citizen-actions">
+                          <button
+                            onClick={() => handleStatusUpdate(citizen.id, 'APPROVED')}
+                            className="btn-approve"
+                          >
+                            <Check size={20} /> Accepter
+                          </button>
+                          <button
+                            onClick={() => handleStatusUpdate(citizen.id, 'REJECTED')}
+                            className="btn-reject"
+                          >
+                            <X size={20} /> Refuser
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
               )}
             </motion.div>
           )}
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
               <AdminProjects />
             </motion.div>
           )}
-          
+
           {activeTab === 'actualites' && (
             <motion.div key="actualites" variants={pageVariants} initial="initial" animate="animate" exit="exit">
               <AdminActualites />
@@ -209,7 +209,7 @@ const AdminDashboard = () => {
               <AdminDemarches />
             </motion.div>
           )}
-          
+
           {activeTab === 'culture' && (
             <motion.div key="culture" variants={pageVariants} initial="initial" animate="animate" exit="exit">
               <AdminCulture />
