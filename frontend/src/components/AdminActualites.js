@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../api/axiosInstance';
 import { Plus, Edit3, Trash2, Calendar, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2, Newspaper } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
@@ -20,7 +20,7 @@ const AdminActualites = () => {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:5000/api/news');
+      const { data } = await api.get('/api/news');
       setNews(data);
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -152,14 +152,11 @@ const AdminActualites = () => {
     };
 
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
       if (editingNews.id || editingNews._id) {
-        await axios.put(`http://localhost:5000/api/news/${editingNews.id || editingNews._id}`, payload, { headers });
+        await api.put(`/api/news/${editingNews.id || editingNews._id}`, payload);
         setSuccessMsg('Actualité mise à jour avec succès.');
       } else {
-        await axios.post('http://localhost:5000/api/news', payload, { headers });
+        await api.post('/api/news', payload);
         setSuccessMsg('Actualité créée et publiée avec succès.');
       }
 
@@ -178,10 +175,7 @@ const AdminActualites = () => {
     setSuccessMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/news/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/news/${id}`);
       setSuccessMsg('Actualité supprimée avec succès.');
       fetchNews();
     } catch (error) {
@@ -333,7 +327,7 @@ const AdminActualites = () => {
                     {editingNews.image && (
                       <div className="modern-image-preview">
                         <img 
-                          src={editingNews.image.startsWith('http') || editingNews.image.startsWith('/') ? editingNews.image : `http://localhost:5000${editingNews.image}`} 
+                          src={editingNews.image.startsWith('http') || editingNews.image.startsWith('/') ? editingNews.image : `${API_URL}${editingNews.image}`} 
                           alt="Prévisualisation" 
                         />
                         <div className="image-overlay-info">Aperçu du média actuel</div>
@@ -386,7 +380,7 @@ const AdminActualites = () => {
                         <td data-label="Image">
                           <div className="table-img-container">
                             <img 
-                              src={item.image.startsWith('http') || item.image.startsWith('/') ? item.image : `http://localhost:5000${item.image}`} 
+                              src={item.image.startsWith('http') || item.image.startsWith('/') ? item.image : `${API_URL}${item.image}`} 
                               alt={item.title} 
                             />
                           </div>

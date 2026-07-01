@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../api/axiosInstance';
 import { Search, Filter, ArrowUpDown, Check, X, ShieldAlert, CheckCircle2, AlertCircle } from 'lucide-react';
 import '../styles/AdminUsers.css';
 
@@ -16,9 +16,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/users`, config);
+      const { data } = await api.get('/api/admin/users');
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -43,12 +41,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
   // 3. Status Action Handler (Approve / Reject)
   const handleUpdateStatus = async (userId, newStatus, userFullName) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
-      await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/admin/citizen-status/${userId}`, {
-        status: newStatus
-      }, config);
+      await api.put(`/api/admin/citizen-status/${userId}`, { status: newStatus });
 
       // Update local state list
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
@@ -186,7 +179,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
                       <td className="user-name-cell">
                         <div className="avatar-placeholder">
                           {user.profilePicture ? (
-                            <img src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${user.profilePicture}`} alt={fullName} className="avatar-img" />
+                            <img src={`${API_URL}${user.profilePicture}`} alt={fullName} className="avatar-img" />
                           ) : (
                             <>{user.firstName[0] || ''}{user.lastName[0] || ''}</>
                           )}

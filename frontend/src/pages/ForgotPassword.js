@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import api from '../api/axiosInstance'; // Import api
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, ArrowRight, AlertCircle, Check, Key } from 'lucide-react';
 import logo from '../images/LOGO.jpg';
@@ -30,7 +30,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/forgot-password`, { email });
+      await api.post('/api/auth/forgot-password', { email });
       setMessage('Si votre adresse e-mail est enregistrée, un lien de réinitialisation vous a été envoyé.');
       setEmail('');
     } catch (err) {

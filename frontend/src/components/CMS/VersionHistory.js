@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axiosInstance';
 import { History, RotateCcw, X } from 'lucide-react';
 
 const VersionHistory = ({ contentId, onRollback, onClose }) => {
@@ -8,12 +8,7 @@ const VersionHistory = ({ contentId, onRollback, onClose }) => {
 
   useEffect(() => {
     const fetchVersions = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const config = {
-          headers: { Authorization: `Bearer ${token}` }
-        };
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/versions/${contentId}`, config);
+        const { data } = await api.get(`/api/pages/versions/${contentId}`);
         setVersions(data);
       } catch (error) {
         console.error('Error fetching versions:', error);
@@ -28,11 +23,7 @@ const VersionHistory = ({ contentId, onRollback, onClose }) => {
   const handleRollback = async (versionId) => {
     if (window.confirm('Voulez-vous vraiment restaurer cette version ?')) {
       try {
-        const token = localStorage.getItem('token');
-        const config = {
-          headers: { Authorization: `Bearer ${token}` }
-        };
-        const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/rollback/${versionId}`, {}, config);
+        const { data } = await api.post(`/api/pages/rollback/${versionId}`, {});
         onRollback(data);
       } catch (error) {
         alert('Erreur lors de la restauration');

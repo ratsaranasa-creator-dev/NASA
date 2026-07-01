@@ -4,7 +4,7 @@ import {
   MapPin, Calendar, TrendingUp, X, ArrowRight,
   Wallet, Clock, Users, Target, ChevronRight, Edit, Trash2, Share2, ChevronLeft
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ProjectsPage.css';
 import img1 from '../images/001.jpg';
@@ -180,10 +180,7 @@ export default function ProjectsPage() {
   const handleDeleteProject = async (projectId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
       try {
-        const token = localStorage.getItem('token');
-        await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/projects/${projectId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.delete(`/api/projects/${projectId}`);
         // Refresh projects list or remove from state
         setSelectedProject(null); // Close modal
         alert('Projet supprimé avec succès !');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../api/axiosInstance';
 import { Plus, Edit3, Trash2, MapPin, Calendar, Folder, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
@@ -20,7 +20,7 @@ const AdminProjects = () => {
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:5000/api/projects');
+      const { data } = await api.get('/api/projects');
       setProjects(data);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -162,10 +162,10 @@ const AdminProjects = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (editingProject.id) {
-        await axios.put(`http://localhost:5000/api/projects/${editingProject.id}`, payload, { headers });
+        await api.put(`/api/projects/${editingProject.id}`, payload);
         setSuccessMsg('Projet mis à jour avec succès.');
       } else {
-        await axios.post('http://localhost:5000/api/projects', payload, { headers });
+        await api.post('/api/projects', payload);
         setSuccessMsg('Projet créé et publié avec succès.');
       }
 
@@ -184,10 +184,7 @@ const AdminProjects = () => {
     setSuccessMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/projects/${id}`);
       setSuccessMsg('Projet supprimé avec succès.');
       fetchProjects();
     } catch (error) {
@@ -424,7 +421,7 @@ const AdminProjects = () => {
                         <td data-label="Image">
                           <div className="table-img-container">
                             <img 
-                              src={project.image.startsWith('http') ? project.image : `http://localhost:5000${project.image}`} 
+                              src={project.image.startsWith('http') ? project.image : `${API_URL}${project.image}`} 
                               alt={project.title} 
                             />
                           </div>

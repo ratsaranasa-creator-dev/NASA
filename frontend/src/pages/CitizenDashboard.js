@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { jsPDF } from 'jspdf';
 import { FileDown, Send, FileText, ClipboardList } from 'lucide-react';
-import axios from 'axios';
+import api from '../context/../api/axiosInstance';
 
 const CitizenDashboard = () => {
   const { user } = useAuth();
@@ -34,11 +34,7 @@ const CitizenDashboard = () => {
     setLoading(true);
     setMessage('');
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/citizen/request`,
-        { content: request },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.post('/api/citizen/request', { content: request });
       setMessage('Votre demande a été envoyée avec succès.');
       setRequest('');
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../api/axiosInstance';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Calendar, ArrowRight, X, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
@@ -34,7 +34,7 @@ const Actualites = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/news`);
+        const { data } = await api.get('/api/news');
         setNews(data);
       } catch (error) {
         console.error('Error fetching news:', error);
@@ -153,7 +153,7 @@ const Actualites = () => {
                 >
                   <div className="relative h-56 md:h-64 overflow-hidden">
                     <img
-                      src={item.image.startsWith('http') || item.image.startsWith('data:') || (item.image.startsWith('/') && !item.image.startsWith('/uploads')) ? item.image : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.image}`}
+                      src={item.image.startsWith('http') || item.image.startsWith('data:') || (item.image.startsWith('/') && !item.image.startsWith('/uploads')) ? item.image : `${API_URL}${item.image}`}
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"

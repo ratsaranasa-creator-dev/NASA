@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../../api/axiosInstance';
 import { Image as ImageIcon, Save } from 'lucide-react';
 import { useCMS } from '../../context/CMSContext';
 
@@ -14,7 +14,7 @@ const AdminCMS = () => {
   const fetchContent = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/pages/${selectedPage}`);
+      const { data } = await api.get(`/api/pages/${selectedPage}`);
       setPageContent(data);
     } catch (error) {
       console.error('Error fetching page content:', error);
@@ -118,7 +118,7 @@ const AdminCMS = () => {
                   <div className="item-body">
                     {item.contentType === 'image' ? (
                       <div className="image-preview-admin">
-                        <img src={item.contentValue.startsWith('http') ? item.contentValue : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.contentValue}`} alt="" />
+                        <img src={item.contentValue.startsWith('http') ? item.contentValue : `${API_URL}${item.contentValue}`} alt="" />
                         <label className="btn-change-image">
                           <ImageIcon size={16} /> Remplacer
                           <input type="file" onChange={(e) => handleFileChange(item, e.target.files[0])} style={{ display: 'none' }} />

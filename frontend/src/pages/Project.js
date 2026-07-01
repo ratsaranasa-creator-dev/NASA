@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
+import api from '../api/axiosInstance';
 import { Filter, MapPin, Calendar, Users, CheckCircle2, ArrowRight, TrendingUp, Wallet, ChevronRight, ChevronLeft, GraduationCap, Palmtree, X, Building2, Leaf, Heart, BookOpen, Lightbulb, ChevronDown, Mail, Phone, Star, Award } from 'lucide-react';
 import ProjectComments from '../components/ProjectComments';
 import heroImg from '../images/0002.jpg';
@@ -83,7 +84,7 @@ const Project = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/projects`);
+        const { data } = await api.get('/api/projects');
         setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -111,7 +112,7 @@ const Project = () => {
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
       return imagePath;
     }
-    return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${imagePath}`;
+    return `${process.env.REACT_APP_API_URL || 'https://dembeni-backend-0soo.onrender.com'}${imagePath}`;
   };
 
   const filteredProjects = projects.filter(project => {

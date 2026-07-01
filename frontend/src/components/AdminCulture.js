@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../api/axiosInstance';
 import { Plus, Edit3, Trash2, Save, X, AlertCircle, CheckCircle2, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AdminProjects.css';
@@ -19,7 +19,7 @@ const AdminCulture = () => {
   const fetchStructures = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:5000/api/culture');
+      const { data } = await api.get('/api/culture');
       setStructures(data);
     } catch (error) {
       console.error('Error fetching structures:', error);
@@ -140,11 +140,8 @@ const AdminCulture = () => {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-          const uploadRes = await axios.post('http://localhost:5000/api/pages/upload', formData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data',
-            },
+          const uploadRes = await api.post('/api/pages/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
           });
           imageUrl = uploadRes.data.url;
         } catch (uploadError) {
@@ -162,10 +159,10 @@ const AdminCulture = () => {
       };
 
       if (editingStructure.id || editingStructure._id) {
-        await axios.put(`http://localhost:5000/api/culture/${editingStructure.id || editingStructure._id}`, payload, { headers });
+        await api.put(`/api/culture/${editingStructure.id || editingStructure._id}`, payload);
         setSuccessMsg('Structure mise à jour avec succès. ✅');
       } else {
-        await axios.post('http://localhost:5000/api/culture', payload, { headers });
+        await api.post('/api/culture', payload);
         setSuccessMsg('Structure créée et publiée avec succès. ✅');
       }
 
@@ -189,10 +186,7 @@ const AdminCulture = () => {
     setSuccessMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/culture/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/culture/${id}`);
       setSuccessMsg('Structure supprimée avec succès.');
       fetchStructures();
     } catch (error) {
@@ -202,9 +196,7 @@ const AdminCulture = () => {
 
   const handleToggleActive = async (structure) => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-      await axios.put(`http://localhost:5000/api/culture/${structure.id || structure._id}`, { actif: !structure.actif }, { headers });
+      await api.put(`/api/culture/${structure.id || structure._id}`, { actif: !structure.actif });
       fetchStructures();
     } catch (error) {
       setErrorMsg('Erreur lors du changement de statut.');
@@ -354,7 +346,7 @@ const AdminCulture = () => {
                     {(previewUrl || editingStructure.image) && (
                       <div className="modern-image-preview">
                         <img 
-                          src={previewUrl || (editingStructure.image.startsWith('http') ? editingStructure.image : `http://localhost:5000${editingStructure.image.startsWith('/') ? '' : '/'}${editingStructure.image}`)} 
+                          src={previewUrl || (editingStructure.image.startsWith('http') ? editingStructure.image : `${API_URL}${editingStructure.image.startsWith('/') ? '' : '/'}${editingStructure.image}`)} 
                           alt="Prévisualisation" 
                         />
                         <div className="image-overlay-info">
@@ -404,7 +396,7 @@ const AdminCulture = () => {
                           <div className="table-img-container">
                             {item.image ? (
                               <img 
-                                src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image.startsWith('/') ? '' : '/'}${item.image}`} 
+                                src={item.image.startsWith('http') ? item.image : `${API_URL}${item.image.startsWith('/') ? '' : '/'}${item.image}`} 
                                 alt={item.nom} 
                               />
                             ) : (
