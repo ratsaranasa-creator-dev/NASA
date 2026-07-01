@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api, { API_URL } from '../api/axiosInstance';
+import axios from 'axios';
 import { Search, Filter, ArrowUpDown, Check, X, ShieldAlert, CheckCircle2, AlertCircle } from 'lucide-react';
+import { API_URL } from '../apiConfig';
 import '../styles/AdminUsers.css';
 
 const AdminUsers = ({ onRefreshNotification }) => {
@@ -16,7 +17,9 @@ const AdminUsers = ({ onRefreshNotification }) => {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/admin/users');
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data } = await axios.get(`${API_URL}/api/admin/users`, config);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -41,7 +44,12 @@ const AdminUsers = ({ onRefreshNotification }) => {
   // 3. Status Action Handler (Approve / Reject)
   const handleUpdateStatus = async (userId, newStatus, userFullName) => {
     try {
-      await api.put(`/api/admin/citizen-status/${userId}`, { status: newStatus });
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      await axios.put(`${API_URL}/api/admin/citizen-status/${userId}`, {
+        status: newStatus
+      }, config);
 
       // Update local state list
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));

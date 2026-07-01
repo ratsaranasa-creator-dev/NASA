@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import api, { API_URL } from '../api/axiosInstance';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Music, Users, Trophy, MapPin, Clock, Calendar, Ticket, Palette, Dumbbell, Activity, Landmark } from 'lucide-react';
+import { API_URL } from '../apiConfig';
 import '../styles/PublicPages.css';
 
 // Dynamic icon mapping
@@ -26,7 +27,7 @@ const Culture = () => {
   useEffect(() => {
     const fetchStructures = async () => {
       try {
-        const { data } = await api.get('/api/culture');
+        const { data } = await axios.get(`${API_URL}/api/culture`);
         // Filter only active structures for the public page
         const activeStructures = data.filter(item => item.actif);
         setStructures(activeStructures);

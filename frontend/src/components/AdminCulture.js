@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api, { API_URL } from '../api/axiosInstance';
+import axios from 'axios';
 import { Plus, Edit3, Trash2, Save, X, AlertCircle, CheckCircle2, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../apiConfig';
 import '../styles/AdminProjects.css';
 
 const AdminCulture = () => {
@@ -19,7 +20,7 @@ const AdminCulture = () => {
   const fetchStructures = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/culture');
+      const { data } = await axios.get(`${API_URL}/api/culture`);
       setStructures(data);
     } catch (error) {
       console.error('Error fetching structures:', error);
@@ -140,8 +141,11 @@ const AdminCulture = () => {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-          const uploadRes = await api.post('/api/pages/upload', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+          const uploadRes = await axios.post(`${API_URL}/api/pages/upload`, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            },
           });
           imageUrl = uploadRes.data.url;
         } catch (uploadError) {
@@ -159,10 +163,10 @@ const AdminCulture = () => {
       };
 
       if (editingStructure.id || editingStructure._id) {
-        await api.put(`/api/culture/${editingStructure.id || editingStructure._id}`, payload);
+        await axios.put(`${API_URL}/api/culture/${editingStructure.id || editingStructure._id}`, payload, { headers });
         setSuccessMsg('Structure mise à jour avec succès. ✅');
       } else {
-        await api.post('/api/culture', payload);
+        await axios.post(`${API_URL}/api/culture`, payload, { headers });
         setSuccessMsg('Structure créée et publiée avec succès. ✅');
       }
 
@@ -186,7 +190,10 @@ const AdminCulture = () => {
     setSuccessMsg('');
 
     try {
-      await api.delete(`/api/culture/${id}`);
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/culture/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setSuccessMsg('Structure supprimée avec succès.');
       fetchStructures();
     } catch (error) {
@@ -196,7 +203,9 @@ const AdminCulture = () => {
 
   const handleToggleActive = async (structure) => {
     try {
-      await api.put(`/api/culture/${structure.id || structure._id}`, { actif: !structure.actif });
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.put(`${API_URL}/api/culture/${structure.id || structure._id}`, { actif: !structure.actif }, { headers });
       fetchStructures();
     } catch (error) {
       setErrorMsg('Erreur lors du changement de statut.');

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import api, { API_URL } from '../api/axiosInstance';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Calendar, ArrowRight, X, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
 import bgImage from '../images/01.jpg';
+import { API_URL } from '../apiConfig';
 
 const ALL_CATEGORIES = ["Toutes", "Municipalité", "Travaux", "Événement", "Culture", "Santé"];
 
@@ -34,7 +35,7 @@ const Actualites = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const { data } = await api.get('/api/news');
+        const { data } = await axios.get(`${API_URL}/api/news`);
         setNews(data);
       } catch (error) {
         console.error('Error fetching news:', error);
@@ -245,7 +246,7 @@ const Actualites = () => {
 
               <div className="relative h-64 sm:h-80 w-full shrink-0">
                 <img
-                  src={selectedArticle.image.startsWith('http') || selectedArticle.image.startsWith('data:') || (selectedArticle.image.startsWith('/') && !selectedArticle.image.startsWith('/uploads')) ? selectedArticle.image : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${selectedArticle.image}`}
+                  src={selectedArticle.image.startsWith('http') || selectedArticle.image.startsWith('data:') || (selectedArticle.image.startsWith('/') && !selectedArticle.image.startsWith('/uploads')) ? selectedArticle.image : `${API_URL}${selectedArticle.image}`}
                   alt={selectedArticle.title}
                   className="w-full h-full object-cover"
                 />

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api, { API_URL } from '../../api/axiosInstance';
+import axios from 'axios';
 import { Image as ImageIcon, Save } from 'lucide-react';
 import { useCMS } from '../../context/CMSContext';
+import { API_URL } from '../../apiConfig';
 
 const AdminCMS = () => {
   const { updateContent, uploadImage } = useCMS();
@@ -14,7 +15,7 @@ const AdminCMS = () => {
   const fetchContent = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/api/pages/${selectedPage}`);
+      const { data } = await axios.get(`${API_URL}/api/pages/${selectedPage}`);
       setPageContent(data);
     } catch (error) {
       console.error('Error fetching page content:', error);

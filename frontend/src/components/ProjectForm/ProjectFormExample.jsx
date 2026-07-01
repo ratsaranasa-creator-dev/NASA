@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiPlus, FiArrowRight } from 'react-icons/fi';
-import ProjectForm from '../ProjectForm/ProjectForm';
+import ProjectForm from '../ProjectForm/ProjectForm';import { API_URL } from '../../apiConfig';
+
 import './ProjectFormExample.css';
 
 /**
@@ -41,7 +42,7 @@ export default function ProjectFormExample() {
       });
 
       // Appeler l'API
-      const response = await fetch('http://localhost:5000/api/projects', {
+      const response = await fetch(`${API_URL}/api/projects`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

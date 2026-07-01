@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import api from '../api/axiosInstance'; // Import api
+import axios from 'axios'; // Import axios
 import { motion } from 'framer-motion';
 import logo from '../images/LOGO.jpg';
+import { API_URL } from '../apiConfig';
 import '../styles/Auth.css';
 
 const ResetPassword = () => {
@@ -61,7 +62,7 @@ const ResetPassword = () => {
     }
 
     try {
-      await api.put(`/api/auth/reset-password/${token}`, { password });
+      await axios.put(`${API_URL}/api/auth/reset-password/${token}`, { password });
       setMessage('Votre mot de passe a été réinitialisé avec succès ! Redirection vers la page de connexion...');
       setPassword('');
       setConfirmPassword('');

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api, { API_URL } from '../api/axiosInstance';
+import axios from 'axios';
 import { Plus, Edit3, Trash2, MapPin, Calendar, Folder, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
+import { API_URL } from '../apiConfig';
 import '../styles/AdminProjects.css';
 
 const AdminProjects = () => {
@@ -20,7 +21,7 @@ const AdminProjects = () => {
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/projects');
+      const { data } = await axios.get(`${API_URL}/api/projects`);
       setProjects(data);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -162,10 +163,10 @@ const AdminProjects = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (editingProject.id) {
-        await api.put(`/api/projects/${editingProject.id}`, payload);
+        await axios.put(`${API_URL}/api/projects/${editingProject.id}`, payload, { headers });
         setSuccessMsg('Projet mis à jour avec succès.');
       } else {
-        await api.post('/api/projects', payload);
+        await axios.post(`${API_URL}/api/projects`, payload, { headers });
         setSuccessMsg('Projet créé et publié avec succès.');
       }
 
@@ -184,7 +185,10 @@ const AdminProjects = () => {
     setSuccessMsg('');
 
     try {
-      await api.delete(`/api/projects/${id}`);
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/projects/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setSuccessMsg('Projet supprimé avec succès.');
       fetchProjects();
     } catch (error) {
@@ -366,7 +370,7 @@ const AdminProjects = () => {
                     {editingProject.image && (
                       <div className="modern-image-preview">
                         <img 
-                          src={editingProject.image.startsWith('http') ? editingProject.image : `http://localhost:5000${editingProject.image}`} 
+                          src={editingProject.image.startsWith('http') ? editingProject.image : `${API_URL}${editingProject.image}`} 
                           alt="Prévisualisation" 
                         />
                         <div className="image-overlay-info">Aperçu du média actuel</div>

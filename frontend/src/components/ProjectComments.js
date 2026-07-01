@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api from '../api/axiosInstance';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { CornerDownRight, Trash2, Send, X, Lock, User, MessageCircle } from 'lucide-react';
+import { API_URL } from '../apiConfig';
 import '../styles/ProjectComments.css';
 
 const ProjectComments = ({ projectId }) => {
@@ -20,7 +21,7 @@ const ProjectComments = ({ projectId }) => {
   const fetchComments = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/api/comments/project/${projectId}`);
+      const { data } = await axios.get(`${API_URL}/api/comments/project/${projectId}`);
       setComments(data);
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -69,10 +70,13 @@ const ProjectComments = ({ projectId }) => {
     setSubmitting(true);
     setErrorMsg('');
     try {
-      const { data } = await api.post('/api/comments', {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const { data } = await axios.post(`${API_URL}/api/comments`, {
         content: newCommentContent,
         projectId
-      });
+      }, config);
 
       setComments(prev => [...prev, data]);
       setNewCommentContent('');
@@ -91,11 +95,14 @@ const ProjectComments = ({ projectId }) => {
     setSubmitting(true);
     setErrorMsg('');
     try {
-      const { data } = await api.post('/api/comments', {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const { data } = await axios.post(`${API_URL}/api/comments`, {
         content: replyContent,
         projectId,
         parentId
-      });
+      }, config);
 
       setComments(prev => [...prev, data]);
       setReplyContent('');
@@ -113,7 +120,10 @@ const ProjectComments = ({ projectId }) => {
 
     setErrorMsg('');
     try {
-      await api.delete(`/api/comments/${commentId}`);
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      await axios.delete(`${API_URL}/api/comments/${commentId}`, config);
 
       // Remove deleted comment and all of its recursive children from local state
       setComments(prev => {

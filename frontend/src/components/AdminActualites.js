@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api, { API_URL } from '../api/axiosInstance';
+import axios from 'axios';
 import { Plus, Edit3, Trash2, Calendar, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2, Newspaper } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
+import { API_URL } from '../apiConfig';
 import '../styles/AdminProjects.css'; // Reusing the same CSS to maintain consistency
 
 const AdminActualites = () => {
@@ -20,7 +21,7 @@ const AdminActualites = () => {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/news');
+      const { data } = await axios.get(`${API_URL}/api/news`);
       setNews(data);
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -152,11 +153,14 @@ const AdminActualites = () => {
     };
 
     try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
       if (editingNews.id || editingNews._id) {
-        await api.put(`/api/news/${editingNews.id || editingNews._id}`, payload);
+        await axios.put(`${API_URL}/api/news/${editingNews.id || editingNews._id}`, payload, { headers });
         setSuccessMsg('Actualité mise à jour avec succès.');
       } else {
-        await api.post('/api/news', payload);
+        await axios.post(`${API_URL}/api/news`, payload, { headers });
         setSuccessMsg('Actualité créée et publiée avec succès.');
       }
 
@@ -175,7 +179,10 @@ const AdminActualites = () => {
     setSuccessMsg('');
 
     try {
-      await api.delete(`/api/news/${id}`);
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/news/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setSuccessMsg('Actualité supprimée avec succès.');
       fetchNews();
     } catch (error) {

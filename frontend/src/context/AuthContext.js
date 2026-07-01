@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import axios from 'axios';
 import jwtDecode from 'jwt-decode';
-import api, { API_URL } from '../api/axiosInstance';
+import { API_URL } from '../apiConfig';
 
 const AuthContext = createContext();
 
@@ -16,9 +17,12 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = useCallback(async (token) => {
     try {
-      const { data } = await api.get('/api/auth/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const { data } = await axios.get(`${API_URL}/api/auth/profile`, config);
       setUser(data);
     } catch (error) {
       logout();
@@ -32,9 +36,11 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        // Check if token expired
         if (decoded.exp * 1000 < Date.now()) {
           logout();
         } else {
+          // Fetch user profile from backend
           fetchProfile(token);
         }
       } catch (error) {
@@ -46,14 +52,14 @@ export const AuthProvider = ({ children }) => {
   }, [fetchProfile, logout]);
 
   const login = async (email, password) => {
-    const { data } = await api.post('/api/auth/login', { email, password });
+    const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password });
     localStorage.setItem('token', data.token);
     setUser(data);
     return data;
   };
 
   const register = async (userData) => {
-    const { data } = await api.post('/api/auth/register', userData);
+    const { data } = await axios.post(`${API_URL}/api/auth/register`, userData);
     return data;
   };
 

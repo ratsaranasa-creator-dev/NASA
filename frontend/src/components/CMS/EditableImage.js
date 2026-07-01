@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useCMS } from '../../context/CMSContext';
 import { Upload } from 'lucide-react';
+import { API_URL } from '../../apiConfig';
 
 const EditableImage = ({ pageName, sectionKey, defaultSrc, className = '', alt = '' }) => {
   const { isEditMode, pageContent, updateContent, uploadImage, fetchPageContent } = useCMS();
 
   const content = pageContent[pageName]?.[sectionKey];
-  const currentSrc = content ? (content.contentValue.startsWith('http') ? content.contentValue : `${process.env.REACT_APP_API_URL || 'https://dembeni-backend-0soo.onrender.com'}${content.contentValue}`) : defaultSrc;
+  const currentSrc = content ? (content.contentValue.startsWith('http') ? content.contentValue : `${API_URL}${content.contentValue}`) : defaultSrc;
 
   useEffect(() => {
     if (!pageContent[pageName]) {
