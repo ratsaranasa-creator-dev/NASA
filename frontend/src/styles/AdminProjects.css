@@ -227,30 +227,43 @@
   border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
+/* Standardized Status Badges */
 .badge-status {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  white-space: nowrap;
 }
 
-.badge-status.en-cours {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+.badge-status.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
-.badge-status.à-venir {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+.badge-status.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
 }
 
-.badge-status.terminé {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+.badge-status.info {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.badge-status.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* Action Buttons */
@@ -259,7 +272,7 @@
   gap: 8px;
 }
 
-.btn-action-edit, .btn-action-delete {
+.btn-action-edit, .btn-action-delete, .btn-action-publish {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
@@ -271,6 +284,13 @@
   cursor: pointer;
   color: #d1d5db;
   transition: all 0.2s ease;
+}
+
+.btn-action-publish:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #34d399;
+  transform: scale(1.05);
 }
 
 .btn-action-edit:hover {

@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { useAuth } from './AuthContext';
-import { API_URL } from '../apiConfig';
 
 const CMSContext = createContext();
 
@@ -14,7 +13,7 @@ export const CMSProvider = ({ children }) => {
   const fetchPageContent = useCallback(async (pageName) => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_URL}/api/pages/${pageName}`);
+      const { data } = await api.get(`/api/pages/${pageName}`);
       const contentMap = {};
       data.forEach(item => {
         contentMap[item.sectionKey] = item;
@@ -28,21 +27,14 @@ export const CMSProvider = ({ children }) => {
   }, []);
 
   const updateContent = async (pageName, sectionKey, contentValue, contentType = 'text', metadata = {}) => {
-    const token = localStorage.getItem('token');
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
     try {
-      const { data } = await axios.put(`${API_URL}/api/pages/content`, {
+      const { data } = await api.put('/api/pages/content', {
         pageName,
         sectionKey,
         contentValue,
         contentType,
         metadata
-      }, config);
+      });
 
       setPageContent(prev => ({
         ...prev,
@@ -59,19 +51,15 @@ export const CMSProvider = ({ children }) => {
   };
 
   const uploadImage = async (file) => {
-    const token = localStorage.getItem('token');
     const formData = new FormData();
     formData.append('image', file);
 
-    const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
     try {
-      const { data } = await axios.post(`${API_URL}/api/pages/upload`, formData, config);
+      const { data } = await api.post('/api/pages/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return data.url;
     } catch (error) {
       console.error('Error uploading image:', error);

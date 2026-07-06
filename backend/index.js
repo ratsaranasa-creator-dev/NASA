@@ -76,6 +76,7 @@ app.use('/api/citizen', require('./routes/citizenRoutes'));
 app.use('/api/pages', require('./routes/pageRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/news', require('./routes/newsRoutes'));
+app.use('/api/demarches', require('./routes/demarcheRoutes'));
 app.use('/api/culture', require('./routes/cultureRoutes'));
 app.use('/api/comments', require('./routes/commentRoutes'));
 

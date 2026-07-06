@@ -25,6 +25,11 @@ const newsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ['brouillon', 'publié'],
+    default: 'publié',
+  },
 }, {
   timestamps: true,
   toJSON: { virtuals: true },

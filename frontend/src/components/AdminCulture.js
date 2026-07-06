@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { Plus, Edit3, Trash2, Save, X, AlertCircle, CheckCircle2, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { API_URL } from '../apiConfig';
+import { toast } from 'react-toastify';
+
 import '../styles/AdminProjects.css';
 
 const AdminCulture = () => {
@@ -13,17 +14,16 @@ const AdminCulture = () => {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
   const fetchStructures = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_URL}/api/culture`);
+      const { data } = await api.get('/api/culture');
       setStructures(data);
     } catch (error) {
       console.error('Error fetching structures:', error);
+      toast.error('Erreur lors de la récupération des structures');
     } finally {
       setLoading(false);
     }
@@ -69,8 +69,6 @@ const AdminCulture = () => {
     setEditingStructure(structure);
     setImageFile(null);
     setPreviewUrl(null);
-    setErrorMsg('');
-    setSuccessMsg('');
     setValidationErrors({});
   };
 
@@ -87,16 +85,18 @@ const AdminCulture = () => {
     });
     setImageFile(null);
     setPreviewUrl(null);
-    setErrorMsg('');
-    setSuccessMsg('');
     setValidationErrors({});
   };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (!file.type.startsWith('image/')) {
-        setValidationErrors(prev => ({ ...prev, image: 'Veuillez sélectionner une image valide (JPG, PNG, WebP).' }));
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype || file.type)) {
+        toast.warning('Veuillez sélectionner une image valide (JPG, PNG, WebP).');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.warning('L\'image ne doit pas dépasser 5 Mo.');
         return;
       }
       // Revoke previous preview URL to avoid memory leaks
@@ -118,39 +118,33 @@ const AdminCulture = () => {
     
     // 1. Validate required fields
     if (!editingStructure.nom || !editingStructure.description || !editingStructure.adresse || !editingStructure.horaires) {
-      setErrorMsg('Tous les champs obligatoires (*) doivent être remplis.');
+      toast.error('Tous les champs obligatoires (*) doivent être remplis.');
       return;
     }
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrorMsg('Veuillez corriger les erreurs avant d\'enregistrer.');
+      toast.error('Veuillez corriger les erreurs avant d\'enregistrer.');
       return;
     }
 
-    setErrorMsg('');
-    setSuccessMsg('');
     setUploadingImage(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
       // 2. Upload image first if a new file was selected
       let imageUrl = editingStructure.image || '';
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-          const uploadRes = await axios.post(`${API_URL}/api/pages/upload`, formData, {
+          const uploadRes = await api.post('/api/culture/upload', formData, {
             headers: {
-              Authorization: `Bearer ${token}`,
               'Content-Type': 'multipart/form-data',
             },
           });
           imageUrl = uploadRes.data.url;
         } catch (uploadError) {
           console.error('Image upload error:', uploadError.response?.data || uploadError.message);
-          setErrorMsg(`Erreur upload image: ${uploadError.response?.data?.message || 'Serveur inaccessible. Vérifiez que le backend est démarré.'}`);
+          toast.error(`Erreur upload image: ${uploadError.response?.data?.message || 'Erreur lors du téléchargement'}`);
           setUploadingImage(false);
           return;
         }
@@ -163,11 +157,11 @@ const AdminCulture = () => {
       };
 
       if (editingStructure.id || editingStructure._id) {
-        await axios.put(`${API_URL}/api/culture/${editingStructure.id || editingStructure._id}`, payload, { headers });
-        setSuccessMsg('Structure mise à jour avec succès. ✅');
+        await api.put(`/api/culture/${editingStructure.id || editingStructure._id}`, payload);
+        toast.success('Structure mise à jour avec succès.');
       } else {
-        await axios.post(`${API_URL}/api/culture`, payload, { headers });
-        setSuccessMsg('Structure créée et publiée avec succès. ✅');
+        await api.post('/api/culture', payload);
+        toast.success('Structure créée et publiée avec succès.');
       }
 
       setEditingStructure(null);
@@ -178,7 +172,7 @@ const AdminCulture = () => {
 
     } catch (error) {
       console.error('Save error:', error.response?.data || error.message);
-      setErrorMsg(error.response?.data?.message || 'Une erreur est survenue lors de l\'enregistrement.');
+      toast.error(error.response?.data?.message || 'Une erreur est survenue lors de l\'enregistrement.');
     } finally {
       setUploadingImage(false);
     }
@@ -186,29 +180,25 @@ const AdminCulture = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette structure ? Cette action est irréversible.')) return;
-    setErrorMsg('');
-    setSuccessMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/culture/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSuccessMsg('Structure supprimée avec succès.');
+      await api.delete(`/api/culture/${id}`);
+      toast.success('Structure supprimée avec succès.');
       fetchStructures();
     } catch (error) {
-      setErrorMsg('Erreur lors de la suppression.');
+      console.error('Delete error:', error);
+      toast.error(error.response?.data?.message || 'Erreur lors de la suppression.');
     }
   };
 
   const handleToggleActive = async (structure) => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-      await axios.put(`${API_URL}/api/culture/${structure.id || structure._id}`, { actif: !structure.actif }, { headers });
+      const newStatus = !structure.actif;
+      await api.put(`/api/culture/${structure.id || structure._id}`, { actif: newStatus });
+      toast.info(`Structure ${newStatus ? 'affichée' : 'masquée'} sur le site public.`);
       fetchStructures();
     } catch (error) {
-      setErrorMsg('Erreur lors du changement de statut.');
+      toast.error('Erreur lors du changement de statut.');
     }
   };
 
@@ -228,17 +218,6 @@ const AdminCulture = () => {
           <button className="btn-add-project" onClick={handleCreateClick}>
             <Plus size={18} /> Nouvelle Structure
           </button>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="alert alert-success">
-          <CheckCircle2 size={20} /> {successMsg}
-        </div>
-      )}
-      {errorMsg && (
-        <div className="alert alert-danger">
-          <AlertCircle size={20} /> {errorMsg}
         </div>
       )}
 
@@ -346,8 +325,8 @@ const AdminCulture = () => {
                       <label className="btn-modern-upload">
                         <ImageIcon size={28} /> 
                         <span>{imageFile ? imageFile.name : (editingStructure.image ? 'Changer l\'image' : 'Sélectionner une image (Optionnel)')}</span>
-                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleFileChange} style={{ display: 'none' }} />
-                        <span className="upload-hint">JPG, PNG ou WebP recommandé</span>
+                        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} style={{ display: 'none' }} />
+                        <span className="upload-hint">JPG, PNG ou WebP (max 5MB)</span>
                       </label>
                       {validationErrors.image && <span className="error-text"><AlertCircle size={14} /> {validationErrors.image}</span>}
                     </div>
@@ -424,9 +403,9 @@ const AdminCulture = () => {
                         <td data-label="Statut">
                           <button 
                             onClick={() => handleToggleActive(item)}
-                            className={`badge ${item.actif ? 'badge-active' : 'badge-inactive'}`}
-                            style={{ cursor: 'pointer', border: 'none' }}
-                            title="Cliquez pour changer le statut"
+                            className={`badge-status ${item.actif ? 'success' : 'danger'}`}
+                            style={{ cursor: 'pointer', border: 'none', padding: '5px 10px', borderRadius: '4px' }}
+                            title="Cliquez pour changer la visibilité"
                           >
                             {item.actif ? 'Visible' : 'Masqué'}
                           </button>

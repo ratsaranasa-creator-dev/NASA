@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { Plus, Edit3, Trash2, Calendar, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2, Newspaper } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
-import { API_URL } from '../apiConfig';
+
 import '../styles/AdminProjects.css'; // Reusing the same CSS to maintain consistency
 
 const AdminActualites = () => {
@@ -21,7 +21,7 @@ const AdminActualites = () => {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_URL}/api/news`);
+      const { data } = await api.get('/api/news?admin=true');
       setNews(data);
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -86,7 +86,8 @@ const AdminActualites = () => {
       content: '',
       date: today,
       image: '',
-      category: 'MUNICIPALITÉ'
+      category: 'MUNICIPALITÉ',
+      status: 'brouillon'
     });
     setImageFile(null);
     setErrorMsg('');
@@ -149,19 +150,17 @@ const AdminActualites = () => {
 
     const payload = {
       ...editingNews,
-      image: imageUrl
+      image: imageUrl,
+      status: editingNews.status || 'brouillon'
     };
 
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
       if (editingNews.id || editingNews._id) {
-        await axios.put(`${API_URL}/api/news/${editingNews.id || editingNews._id}`, payload, { headers });
-        setSuccessMsg('Actualité mise à jour avec succès.');
+        await api.put(`/api/news/${editingNews.id || editingNews._id}`, payload);
+        setSuccessMsg(payload.status === 'publié' ? 'Actualité publiée avec succès.' : 'Actualité mise à jour en tant que brouillon.');
       } else {
-        await axios.post(`${API_URL}/api/news`, payload, { headers });
-        setSuccessMsg('Actualité créée et publiée avec succès.');
+        await api.post('/api/news', payload);
+        setSuccessMsg(payload.status === 'publié' ? 'Actualité créée et publiée avec succès.' : 'Actualité enregistrée en tant que brouillon.');
       }
 
       setEditingNews(null);
@@ -173,16 +172,24 @@ const AdminActualites = () => {
     }
   };
 
+  const handlePublish = async (item) => {
+    try {
+      await api.put(`/api/news/${item.id || item._id}`, { ...item, status: 'publié' });
+      setSuccessMsg('Actualité publiée avec succès.');
+      fetchNews();
+      window.scrollTo(0, 0);
+    } catch (error) {
+      setErrorMsg('Erreur lors de la publication de l\'actualité.');
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette actualité ? Cette action est irréversible.')) return;
     setErrorMsg('');
     setSuccessMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/news/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/news/${id}`);
       setSuccessMsg('Actualité supprimée avec succès.');
       fetchNews();
     } catch (error) {
@@ -303,6 +310,17 @@ const AdminActualites = () => {
                   </div>
 
                   <div className="form-group">
+                    <label>STATUT DE PUBLICATION</label>
+                    <select
+                      value={editingNews.status || 'brouillon'}
+                      onChange={(e) => handleInputChange('status', e.target.value)}
+                    >
+                      <option value="brouillon">Brouillon</option>
+                      <option value="publié">Publié</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
                     <label>DATE D'AFFICHAGE *</label>
                     <input
                       type="text"
@@ -377,6 +395,7 @@ const AdminActualites = () => {
                       <th>Image</th>
                       <th>Titre</th>
                       <th>Catégorie</th>
+                      <th>Statut</th>
                       <th>Date</th>
                       <th>Actions</th>
                     </tr>
@@ -399,11 +418,21 @@ const AdminActualites = () => {
                         <td data-label="Catégorie">
                           <span className="badge badge-category">{item.category}</span>
                         </td>
+                        <td data-label="Statut">
+                          <span className={`badge-status ${item.status === 'publié' ? 'success' : 'warning'}`}>
+                            {item.status === 'publié' ? 'Publié' : 'Brouillon'}
+                          </span>
+                        </td>
                         <td data-label="Date">
                           <div className="table-date"><Calendar size={12} /> {item.date}</div>
                         </td>
                         <td data-label="Actions">
                           <div className="action-buttons">
+                            {item.status !== 'publié' && (
+                              <button className="btn-action-publish" title="Publier maintenant" onClick={() => handlePublish(item)}>
+                                <CheckCircle2 size={16} />
+                              </button>
+                            )}
                             <button className="btn-action-edit" title="Modifier" onClick={() => handleEditClick(item)}>
                               <Edit3 size={16} />
                             </button>

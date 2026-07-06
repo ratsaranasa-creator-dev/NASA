@@ -4,7 +4,7 @@ import {
   MapPin, Calendar, TrendingUp, X, ArrowRight,
   Wallet, Clock, Users, Target, ChevronRight, Edit, Trash2, Share2, ChevronLeft
 } from 'lucide-react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ProjectsPage.css';
 import img1 from '../images/001.jpg';
@@ -12,7 +12,6 @@ import img2 from '../images/002.jpg';
 import img3 from '../images/003.jpg';
 import img4 from '../images/004.jpg';
 import heroImg from '../images/13.jpg';
-import { API_URL } from '../apiConfig';
 
 const sampleProjects = [
   {
@@ -129,7 +128,24 @@ export default function ProjectsPage() {
   const [filterState, setFilterState] = useState('Tous');
   const [openFaq, setOpenFaq] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth(); // Get user from auth context
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data } = await api.get('/api/projects');
+      setProjects(data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleEscape = (event) => {
@@ -152,10 +168,10 @@ export default function ProjectsPage() {
   const categories = ['Toutes', 'Infrastructures', 'Éducation', 'Environnement', 'Social', 'Urbanisme'];
   const states = ['Tous', 'En cours', 'À venir', 'Réalisé'];
 
-  const filtered = sampleProjects.filter(p => {
-    if (filterCategory !== 'Toutes' && p.category !== filterCategory) return false;
-    if (filterState !== 'Tous' && p.state !== filterState) return false;
-    if (query && !(p.title.toLowerCase().includes(query.toLowerCase()) || p.desc.toLowerCase().includes(query.toLowerCase()))) return false;
+  const filtered = projects.filter(p => {
+    if (filterCategory !== 'Toutes' && p.category.toLowerCase() !== filterCategory.toLowerCase()) return false;
+    if (filterState !== 'Tous' && p.status !== filterState) return false;
+    if (query && !(p.title.toLowerCase().includes(query.toLowerCase()) || p.description.toLowerCase().includes(query.toLowerCase()))) return false;
     return true;
   });
 
@@ -181,10 +197,7 @@ export default function ProjectsPage() {
   const handleDeleteProject = async (projectId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
       try {
-        const token = localStorage.getItem('token');
-        await axios.delete(`${API_URL}/api/projects/${projectId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.delete(`/api/projects/${projectId}`);
         // Refresh projects list or remove from state
         setSelectedProject(null); // Close modal
         alert('Projet supprimé avec succès !');
@@ -279,19 +292,19 @@ export default function ProjectsPage() {
         {filtered.length > 0 ? (
           <div className="projects-grid">
             {filtered.map(p => (
-              <article key={p.id} className="project-card" data-state={p.state}>
+              <article key={p.id} className="project-card" data-state={p.status}>
                 <div className="card-image-wrapper">
-                  <div className="card-image" style={{ backgroundImage: `url(${p.img})` }}>
+                  <div className="card-image" style={{ backgroundImage: `url(${p.image.startsWith('http') ? p.image : `${API_URL}${p.image}`})` }}>
                     <div className="image-overlay"></div>
                   </div>
-                  <span className={`state-badge state-${p.state.toLowerCase().replace(' ', '-')}`}>
-                    {p.state}
+                  <span className={`state-badge state-${p.status.toLowerCase().replace(' ', '-')}`}>
+                    {p.status}
                   </span>
                 </div>
 
                 <div className="card-content">
                   <h3 className="card-title">{p.title}</h3>
-                  <p className="card-description">{p.desc}</p>
+                  <p className="card-description">{p.description}</p>
 
                   {p.progress > 0 && (
                     <div className="progress-container">
@@ -308,7 +321,7 @@ export default function ProjectsPage() {
                   <div className="card-footer">
                     <div className="card-meta">
                       <span className="category-tag">{p.category}</span>
-                      <span className="date-tag">📅 {p.date}</span>
+                      <span className="date-tag">📅 {p.startDate}</span>
                     </div>
                     <span className="budget-badge">{p.budget}</span>
                   </div>
@@ -367,16 +380,16 @@ export default function ProjectsPage() {
               </div>
 
               {/* Hero Image Banner */}
-              <div className="detail-hero" style={{ backgroundImage: `url(${selectedProject.img})` }}>
+              <div className="detail-hero" style={{ backgroundImage: `url(${selectedProject.image.startsWith('http') ? selectedProject.image : `${API_URL}${selectedProject.image}`})` }}>
                 <div className="detail-hero-overlay" />
                 <div className="detail-hero-content">
-                  <span className={`detail-state-pill state-${selectedProject.state.toLowerCase().replace(' ', '-')}`}>
-                    {selectedProject.state}
+                  <span className={`detail-state-pill state-${selectedProject.status.toLowerCase().replace(' ', '-')}`}>
+                    {selectedProject.status}
                   </span>
                   <h2>{selectedProject.title}</h2>
                   <div className="detail-hero-meta">
                     <span><MapPin size={16} /> {selectedProject.category}</span>
-                    <span><Calendar size={16} /> {selectedProject.date}</span>
+                    <span><Calendar size={16} /> {selectedProject.startDate}</span>
                     <span><Wallet size={16} /> {selectedProject.budget}</span>
                   </div>
                 </div>
@@ -517,64 +530,71 @@ export default function ProjectsPage() {
       </AnimatePresence>
 
       {/* FEATURED PROJECT */}
-      <section className="featured-project">
-        <div className="featured-container">
-          <div className="featured-image" style={{ backgroundImage: `url(${img3})` }}>
-            <div className="featured-overlay"></div>
-            <div className="featured-badge">🌟 PROJET PHARE</div>
-          </div>
-          <div className="featured-content">
-            <h2>Développement du centre-ville</h2>
-            <p className="featured-description">Un projet ambitieux pour moderniser, embellir et dynamiser le cœur de notre commune avec des espaces verts innovants, des commerces modernes, et des infrastructures de qualité.</p>
-
-            <div className="featured-stats">
-              <div className="featured-stat">
-                <span className="stat-label">Budget</span>
-                <span className="stat-value">5.2M€</span>
-              </div>
-              <div className="featured-stat">
-                <span className="stat-label">Durée</span>
-                <span className="stat-value">24 mois</span>
-              </div>
-              <div className="featured-stat">
-                <span className="stat-label">Bénéficiaires</span>
-                <span className="stat-value">10K+</span>
-              </div>
+      {projects.length > 0 && (
+        <section className="featured-project">
+          <div className="featured-container">
+            <div className="featured-image" style={{ backgroundImage: `url(${projects[0].image.startsWith('http') ? projects[0].image : `${API_URL}${projects[0].image}`})` }}>
+              <div className="featured-overlay"></div>
+              <div className="featured-badge">🌟 PROJET PHARE</div>
             </div>
+            <div className="featured-content">
+              <h2>{projects[0].title}</h2>
+              <p className="featured-description">{projects[0].description}</p>
 
-            <div className="featured-progress">
-              <div className="progress-header">
-                <span>Avancement du projet</span>
-                <span className="progress-percentage">70%</span>
+              <div className="featured-stats">
+                <div className="featured-stat">
+                  <span className="stat-label">Budget</span>
+                  <span className="stat-value">{projects[0].budget || 'N/A'}</span>
+                </div>
+                <div className="featured-stat">
+                  <span className="stat-label">Durée</span>
+                  <span className="stat-value">{projects[0].duration || 'N/A'}</span>
+                </div>
+                <div className="featured-stat">
+                  <span className="stat-label">Bénéficiaires</span>
+                  <span className="stat-value">{projects[0].beneficiaries || 'N/A'}</span>
+                </div>
               </div>
-              <div className="progress-bar large">
-                <div className="progress-fill" style={{ width: '70%' }}></div>
+
+              <div className="featured-progress">
+                <div className="progress-header">
+                  <span>Avancement du projet</span>
+                  <span className="progress-percentage">{projects[0].progress || 0}%</span>
+                </div>
+                <div className="progress-bar large">
+                  <div className="progress-fill" style={{ width: `${projects[0].progress || 0}%` }}></div>
+                </div>
               </div>
+
+              <button className="btn primary-btn" onClick={() => setSelectedProject(projects[0])}>
+                <span>Découvrir le projet →</span>
+              </button>
             </div>
-
-            <button className="btn primary-btn" onClick={() => setSelectedProject(sampleProjects[2])}>
-              <span>Découvrir le projet →</span>
-            </button>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="stats">
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="num">12</div>
+            <div className="num">{projects.filter(p => p.status === 'En cours').length}</div>
             <div className="label">Projets en cours</div>
           </div>
           <div className="stat-card">
-            <div className="num">25</div>
+            <div className="num">{projects.filter(p => p.status === 'Terminé').length}</div>
             <div className="label">Projets réalisés</div>
           </div>
           <div className="stat-card">
-            <div className="num">8</div>
+            <div className="num">{projects.filter(p => p.status === 'À venir').length}</div>
             <div className="label">Projets à venir</div>
           </div>
           <div className="stat-card">
-            <div className="num">18,5 M€</div>
+            <div className="num">
+              {projects.reduce((acc, p) => {
+                const val = parseFloat(p.budget?.replace(/[^\d.]/g, '') || 0);
+                return acc + val;
+              }, 0).toFixed(1)} M€
+            </div>
             <div className="label">Budget total estimé</div>
           </div>
         </div>
@@ -583,10 +603,14 @@ export default function ProjectsPage() {
       <section className="gallery">
         <h3>Suivi en images</h3>
         <div className="gallery-row">
-          <div className="img" style={{ backgroundImage: `url(${img1})` }} />
-          <div className="img" style={{ backgroundImage: `url(${img2})` }} />
-          <div className="img" style={{ backgroundImage: `url(${img3})` }} />
-          <div className="img" style={{ backgroundImage: `url(${img4})` }} />
+          {projects.slice(0, 4).map((p, i) => (
+            <div 
+              key={i} 
+              className="img" 
+              style={{ backgroundImage: `url(${p.image.startsWith('http') ? p.image : `${API_URL}${p.image}`})` }} 
+            />
+          ))}
+          {projects.length === 0 && <p>Aucune image disponible.</p>}
         </div>
       </section>
 

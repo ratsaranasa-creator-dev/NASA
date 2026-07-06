@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios'; // Import axios
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, ArrowRight, AlertCircle, Check, Key } from 'lucide-react';
 import logo from '../images/LOGO.jpg';
-import { API_URL } from '../apiConfig';
+import api, { API_URL } from '../apiConfig';
 import '../styles/SignupPremium.css';
 
 const ForgotPassword = () => {
@@ -31,7 +30,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+      await api.post(`${API_URL}/api/auth/forgot-password`, { email });
       setMessage('Si votre adresse e-mail est enregistrée, un lien de réinitialisation vous a été envoyé.');
       setEmail('');
     } catch (err) {

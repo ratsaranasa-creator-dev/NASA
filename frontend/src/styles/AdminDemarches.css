@@ -257,10 +257,10 @@
   letter-spacing: 0.5px;
 }
 
-.status-badge-green { background: rgba(22, 163, 74, 0.1); color: #16a34a; border: 1px solid rgba(22, 163, 74, 0.2); }
-.status-badge-blue { background: rgba(37, 99, 235, 0.1); color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.2); }
-.status-badge-red { background: rgba(220, 38, 38, 0.1); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2); }
-.status-badge-gray { background: rgba(100, 116, 139, 0.1); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.2); }
+/* Badges are now standardized in AdminProjects.css */
+.status-badge-green, .status-badge-blue, .status-badge-red, .status-badge-gray {
+  display: none;
+}
 
 .assignee, .deadline {
   display: flex;
@@ -453,6 +453,7 @@
   background: #e2e8f0;
   border-radius: 3px;
   outline: none;
+  appearance: none;
   -webkit-appearance: none;
 }
 
@@ -603,3 +604,100 @@
 .pie-segment.green { background: linear-gradient(135deg, #16a34a, #15803d); }
 .pie-segment.orange { background: linear-gradient(135deg, #f97316, #ea580c); }
 .pie-segment.gray { background: linear-gradient(135deg, #64748b, #475569); }
+
+/* --- Upload Styles --- */
+.upload-zone {
+  margin-top: 5px;
+}
+
+.btn-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-upload:hover {
+  background: #f1f5f9;
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+.uploaded-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.file-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.file-tag span {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-tag button {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.file-tag button:hover {
+  color: #dc2626;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.admin-modal-body textarea {
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.3s ease;
+  resize: vertical;
+  min-height: 100px;
+  width: 100%;
+}
+
+.admin-modal-body textarea:focus {
+  background: white;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+}

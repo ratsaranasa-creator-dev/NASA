@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../apiConfig';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, CheckCircle, ArrowRight, RotateCcw, Eye, EyeOff } from 'lucide-react';
-import { API_URL } from '../apiConfig';
 import '../styles/ForgotPassword.css';
 
-const API_URL = `${API_URL}/api/auth`;
+const AUTH_API_URL = '/api/auth';
 
 const EmailStep = ({ onEmailSubmit, loading, error }) => {
   const [email, setEmail] = useState('');
@@ -271,7 +270,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${API_URL}/forgot-password`, { email: submittedEmail });
+      const res = await api.post(`${AUTH_API_URL}/forgot-password`, { email: submittedEmail });
       toast.success(res.data.message);
       setEmail(submittedEmail);
       setStep('otp');
@@ -288,7 +287,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${API_URL}/verify-otp`, { email, otp: submittedOtp });
+      const res = await api.post(`${AUTH_API_URL}/verify-otp`, { email, otp: submittedOtp });
       toast.success(res.data.message);
       setOtp(submittedOtp);
       setStep('reset');
@@ -304,7 +303,7 @@ const ForgotPassword = () => {
     setResendLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${API_URL}/resend-otp`, { email });
+      const res = await api.post(`${AUTH_API_URL}/resend-otp`, { email });
       toast.success(res.data.message);
       setResendTimer(60); // Reset timer
     } catch (err) {
@@ -319,7 +318,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${API_URL}/reset-password`, { email: submittedEmail, otp: submittedOtp, newPassword });
+      const res = await api.post(`${AUTH_API_URL}/reset-password`, { email: submittedEmail, otp: submittedOtp, newPassword });
       toast.success(res.data.message);
       setStep('success');
     } catch (err) {

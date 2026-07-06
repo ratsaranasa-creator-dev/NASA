@@ -1,15 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Plus, Search, Edit2, Trash2, 
   CheckCircle, Clock, AlertTriangle, 
-  User, Calendar, BarChart3, FileText, X, Save
+  User, Calendar, BarChart3, FileText, X, Save, Upload, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDemarches } from '../context/DemarchesContext';
+import { API_URL } from '../apiConfig';
 import '../styles/AdminDemarches.css';
 
 const AdminDemarches = () => {
-  const { demarches, addDemarche, updateDemarche, deleteDemarche } = useDemarches();
+  const { demarches, loading, fetchDemarches, addDemarche, updateDemarche, deleteDemarche, uploadFile } = useDemarches();
   const [activeTab, setActiveTab] = useState('list'); 
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -17,15 +18,38 @@ const AdminDemarches = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [formData, setFormData] = useState({
-    title: '', category: 'État Civil', status: 'À jour', assignedTo: '', deadline: '', progress: 0, shortDesc: ''
+    title: '', 
+    category: 'État Civil', 
+    status: 'publié', 
+    assignedTo: '', 
+    deadline: '', 
+    progress: 0, 
+    shortDesc: '',
+    fullContent: {
+      presentation: '',
+      steps: [],
+      documents: [],
+      delays: '',
+      fees: '',
+      onlineLink: '',
+      downloads: []
+    }
   });
+
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    fetchDemarches(true);
+  }, [fetchDemarches]);
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "À jour": return <span className="status-badge-green">À jour</span>;
-      case "En révision": return <span className="status-badge-blue">En révision</span>;
-      case "Obsolète": return <span className="status-badge-red">Obsolète</span>;
-      default: return <span className="status-badge-gray">{status}</span>;
+      case "À jour":
+      case "publié": return <span className="badge-status success">Publié</span>;
+      case "En révision":
+      case "brouillon": return <span className="badge-status warning">Brouillon</span>;
+      case "Obsolète": return <span className="badge-status danger">Obsolète</span>;
+      default: return <span className="badge-status info">{status}</span>;
     }
   };
 
@@ -33,32 +57,75 @@ const AdminDemarches = () => {
     return demarches.filter(d => d.title.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [demarches, searchTerm]);
 
-  const handleDelete = (id) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette démarche ?")) {
-      deleteDemarche(id);
+  const handleDelete = async (id) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette démarche ? Cette action est irréversible.")) {
+      await deleteDemarche(id);
     }
   };
 
   const openAddModal = () => {
     setModalMode('add');
-    setFormData({ title: '', category: 'État Civil', status: 'À jour', assignedTo: '', deadline: '', progress: 0, shortDesc: '' });
+    setFormData({
+      title: '', 
+      category: 'État Civil', 
+      status: 'publié', 
+      assignedTo: '', 
+      deadline: '', 
+      progress: 0, 
+      shortDesc: '',
+      fullContent: {
+        presentation: '',
+        steps: [],
+        documents: [],
+        delays: '',
+        fees: '',
+        onlineLink: '',
+        downloads: []
+      }
+    });
     setIsModalOpen(true);
   };
 
   const openEditModal = (demarche) => {
     setModalMode('edit');
-    setFormData({ ...demarche });
+    setFormData({ 
+      ...demarche,
+      deadline: demarche.deadline ? demarche.deadline.split('T')[0] : ''
+    });
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (modalMode === 'add') {
-      addDemarche(formData);
-    } else {
-      updateDemarche(formData);
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const result = await uploadFile(file);
+      setFormData(prev => ({
+        ...prev,
+        fullContent: {
+          ...prev.fullContent,
+          downloads: [...(prev.fullContent.downloads || []), { label: result.label, url: result.url }]
+        }
+      }));
+    } finally {
+      setUploading(false);
     }
-    setIsModalOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (modalMode === 'add') {
+        await addDemarche(formData);
+      } else {
+        await updateDemarche(formData._id, formData);
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      // toast is already handled in context
+    }
   };
 
   return (
@@ -310,6 +377,57 @@ const AdminDemarches = () => {
                     value={formData.progress} 
                     onChange={e => setFormData({...formData, progress: parseInt(e.target.value)})}
                   />
+                </div>
+
+                <div className="form-group">
+                  <label>Présentation (Détails complets)</label>
+                  <textarea 
+                    value={formData.fullContent?.presentation || ''} 
+                    onChange={e => setFormData({
+                      ...formData, 
+                      fullContent: { ...formData.fullContent, presentation: e.target.value }
+                    })}
+                    placeholder="Texte complet de présentation..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Documents à télécharger (PDF, JPG, PNG)</label>
+                  <div className="upload-zone">
+                    <input 
+                      type="file" 
+                      id="file-upload" 
+                      onChange={handleFileUpload} 
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="file-upload" className="btn-upload">
+                      {uploading ? <Clock className="animate-spin" size={18} /> : <Upload size={18} />}
+                      {uploading ? 'Téléchargement...' : 'Ajouter un document'}
+                    </label>
+                  </div>
+                  <div className="uploaded-files">
+                    {formData.fullContent?.downloads?.map((file, idx) => (
+                      <div key={idx} className="file-tag">
+                        <FileText size={14} />
+                        <span>{file.label}</span>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const newDownloads = [...formData.fullContent.downloads];
+                            newDownloads.splice(idx, 1);
+                            setFormData({
+                              ...formData,
+                              fullContent: { ...formData.fullContent, downloads: newDownloads }
+                            });
+                          }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="admin-modal-footer">

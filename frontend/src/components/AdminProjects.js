@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { Plus, Edit3, Trash2, MapPin, Calendar, Folder, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
-import { API_URL } from '../apiConfig';
+
 import '../styles/AdminProjects.css';
 
 const AdminProjects = () => {
@@ -21,7 +21,7 @@ const AdminProjects = () => {
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_URL}/api/projects`);
+      const { data } = await api.get('/api/projects');
       setProjects(data);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -90,7 +90,15 @@ const AdminProjects = () => {
       endDate: '',
       image: '',
       category: 'infra',
-      status: 'En cours'
+      status: 'À venir',
+      budget: '',
+      fullDescription: '',
+      objectives: [],
+      timeline: [],
+      beneficiaries: '',
+      duration: '',
+      manager: '',
+      progress: 0
     });
     setImageFile(null);
     setErrorMsg('');
@@ -159,14 +167,11 @@ const AdminProjects = () => {
     };
 
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
       if (editingProject.id) {
-        await axios.put(`${API_URL}/api/projects/${editingProject.id}`, payload, { headers });
+        await api.put(`/api/projects/${editingProject.id}`, payload);
         setSuccessMsg('Projet mis à jour avec succès.');
       } else {
-        await axios.post(`${API_URL}/api/projects`, payload, { headers });
+        await api.post('/api/projects', payload);
         setSuccessMsg('Projet créé et publié avec succès.');
       }
 
@@ -185,10 +190,7 @@ const AdminProjects = () => {
     setSuccessMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/projects/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/projects/${id}`);
       setSuccessMsg('Projet supprimé avec succès.');
       fetchProjects();
     } catch (error) {
@@ -268,12 +270,51 @@ const AdminProjects = () => {
                       value={editingProject.description}
                       onChange={(e) => handleInputChange('description', e.target.value)}
                       className={validationErrors.description ? 'input-error' : ''}
-                      placeholder="Détaillez les objectifs, bénéfices et travaux prévus..."
-                      rows={12}
+                      placeholder="Résumé court (apparaît sur la carte)..."
+                      rows={4}
                     />
                     {validationErrors.description && (
                       <span className="error-text"><AlertCircle size={14} /> {validationErrors.description}</span>
                     )}
+                  </div>
+
+                  <div className="form-group">
+                    <label>PRÉSENTATION DÉTAILLÉE</label>
+                    <textarea
+                      value={editingProject.fullDescription || ''}
+                      onChange={(e) => handleInputChange('fullDescription', e.target.value)}
+                      placeholder="Description complète du projet, objectifs détaillés..."
+                      rows={8}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>OBJECTIFS (Un par ligne)</label>
+                    <textarea
+                      value={editingProject.objectives?.join('\n') || ''}
+                      onChange={(e) => handleInputChange('objectives', e.target.value.split('\n'))}
+                      placeholder="Objectif 1&#10;Objectif 2&#10;..."
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>CHRONOLOGIE (JSON - Expert)</label>
+                    <textarea
+                      value={JSON.stringify(editingProject.timeline || [], null, 2)}
+                      onChange={(e) => {
+                        try {
+                          const parsed = JSON.parse(e.target.value);
+                          handleInputChange('timeline', parsed);
+                        } catch (err) {
+                          // Allow typing invalid JSON temporarily
+                          setEditingProject({ ...editingProject, timeline_raw: e.target.value });
+                        }
+                      }}
+                      placeholder='[{"phase": "Etudes", "period": "2023", "done": true}]'
+                      rows={6}
+                    />
+                    <small className="help-text">Format: {'[{"phase": "Nom", "period": "Dates", "done": true/false}]'}</small>
                   </div>
                 </div>
               </div>
@@ -281,75 +322,138 @@ const AdminProjects = () => {
               {/* Right Column: Localisation, Chronologie, Media */}
               <div className="form-column">
                 <div className="form-section-card">
-                  <h5><MapPin size={18} /> LOCALISATION & TYPE</h5>
-                  <div className="form-group">
-                    <label>LIEU *</label>
-                    <input
-                      type="text"
-                      value={editingProject.location}
-                      onChange={(e) => handleInputChange('location', e.target.value)}
-                      className={validationErrors.location ? 'input-error' : ''}
-                      placeholder="Ex: Dembéni Centre"
-                    />
-                    {validationErrors.location && (
-                      <span className="error-text"><AlertCircle size={14} /> {validationErrors.location}</span>
-                    )}
+                  <h5><MapPin size={18} /> INFOS COMPLÉMENTAIRES</h5>
+                  <div className="form-grid-2">
+                    <div className="form-group">
+                      <label>LIEU *</label>
+                      <input
+                        type="text"
+                        value={editingProject.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        className={validationErrors.location ? 'input-error' : ''}
+                        placeholder="Ex: Dembéni Centre"
+                      />
+                      {validationErrors.location && (
+                        <span className="error-text"><AlertCircle size={14} /> {validationErrors.location}</span>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label>BUDGET ESTIMÉ</label>
+                      <input
+                        type="text"
+                        value={editingProject.budget || ''}
+                        onChange={(e) => handleInputChange('budget', e.target.value)}
+                        placeholder="Ex: 2.5M€"
+                      />
+                    </div>
                   </div>
 
-                  <div className="form-group">
-                    <label>CATÉGORIE *</label>
-                    <select
-                      value={editingProject.category}
-                      onChange={(e) => handleInputChange('category', e.target.value)}
-                    >
-                      <option value="infra">Infrastructures</option>
-                      <option value="education">Éducation</option>
-                      <option value="environnement">Environnement</option>
-                      <option value="social">Social</option>
-                      <option value="culture">Culture</option>
-                    </select>
+                  <div className="form-grid-2">
+                    <div className="form-group">
+                      <label>CATÉGORIE *</label>
+                      <select
+                        value={editingProject.category}
+                        onChange={(e) => handleInputChange('category', e.target.value)}
+                      >
+                        <option value="infra">Infrastructures</option>
+                        <option value="education">Éducation</option>
+                        <option value="environnement">Environnement</option>
+                        <option value="social">Social</option>
+                        <option value="culture">Culture</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>RESPONSABLE / DIRECTION</label>
+                      <input
+                        type="text"
+                        value={editingProject.manager || ''}
+                        onChange={(e) => handleInputChange('manager', e.target.value)}
+                        placeholder="Ex: Direction des Services Techniques"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-grid-2">
+                    <div className="form-group">
+                      <label>BÉNÉFICIAIRES</label>
+                      <input
+                        type="text"
+                        value={editingProject.beneficiaries || ''}
+                        onChange={(e) => handleInputChange('beneficiaries', e.target.value)}
+                        placeholder="Ex: 15 000+ habitants"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>DURÉE ESTIMÉE</label>
+                      <input
+                        type="text"
+                        value={editingProject.duration || ''}
+                        onChange={(e) => handleInputChange('duration', e.target.value)}
+                        placeholder="Ex: 18 mois"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className="form-section-card">
-                  <h5><Calendar size={18} /> CHRONOLOGIE</h5>
-                  <div className="form-group">
-                    <label>DÉBUT DES TRAVAUX *</label>
-                    <input
-                      type="date"
-                      value={editingProject.startDate}
-                      onChange={(e) => handleInputChange('startDate', e.target.value)}
-                      className={validationErrors.startDate ? 'input-error' : ''}
-                    />
-                    {validationErrors.startDate && (
-                      <span className="error-text"><AlertCircle size={14} /> {validationErrors.startDate}</span>
-                    )}
+                  <h5><Calendar size={18} /> CHRONOLOGIE & AVANCEMENT</h5>
+                  <div className="form-grid-2">
+                    <div className="form-group">
+                      <label>DÉBUT DES TRAVAUX *</label>
+                      <input
+                        type="date"
+                        value={editingProject.startDate}
+                        onChange={(e) => handleInputChange('startDate', e.target.value)}
+                        className={validationErrors.startDate ? 'input-error' : ''}
+                      />
+                      {validationErrors.startDate && (
+                        <span className="error-text"><AlertCircle size={14} /> {validationErrors.startDate}</span>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label>FIN ESTIMÉE *</label>
+                      <input
+                        type="date"
+                        value={editingProject.endDate}
+                        onChange={(e) => handleInputChange('endDate', e.target.value)}
+                        className={validationErrors.endDate ? 'input-error' : ''}
+                      />
+                      {validationErrors.endDate && (
+                        <span className="error-text"><AlertCircle size={14} /> {validationErrors.endDate}</span>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="form-group">
-                    <label>FIN ESTIMÉE *</label>
-                    <input
-                      type="date"
-                      value={editingProject.endDate}
-                      onChange={(e) => handleInputChange('endDate', e.target.value)}
-                      className={validationErrors.endDate ? 'input-error' : ''}
-                    />
-                    {validationErrors.endDate && (
-                      <span className="error-text"><AlertCircle size={14} /> {validationErrors.endDate}</span>
-                    )}
-                  </div>
+                  <div className="form-grid-2">
+                    <div className="form-group">
+                      <label>ÉTAT D'AVANCEMENT *</label>
+                      <select
+                        value={editingProject.status}
+                        onChange={(e) => handleInputChange('status', e.target.value)}
+                        className="status-select"
+                      >
+                        <option value="En cours">En cours</option>
+                        <option value="À venir">À venir</option>
+                        <option value="Terminé">Terminé</option>
+                      </select>
+                    </div>
 
-                  <div className="form-group">
-                    <label>ÉTAT D'AVANCEMENT *</label>
-                    <select
-                      value={editingProject.status}
-                      onChange={(e) => handleInputChange('status', e.target.value)}
-                      className="status-select"
-                    >
-                      <option value="En cours">En cours</option>
-                      <option value="À venir">À venir</option>
-                      <option value="Terminé">Terminé</option>
-                    </select>
+                    <div className="form-group">
+                      <label>PROGRESSION (%) : {editingProject.progress || 0}%</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={editingProject.progress || 0}
+                        onChange={(e) => handleInputChange('progress', parseInt(e.target.value))}
+                        className="progress-slider"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -421,7 +525,7 @@ const AdminProjects = () => {
                   </thead>
                   <tbody>
                     {projects.map((project) => (
-                      <tr key={project.id}>
+                      <tr key={project.id || project._id}>
                         <td data-label="Image">
                           <div className="table-img-container">
                             <img 
@@ -438,7 +542,12 @@ const AdminProjects = () => {
                           <span className="badge badge-category"><Folder size={12} /> {project.category}</span>
                         </td>
                         <td data-label="Statut">
-                          <span className={`badge-status ${project.status.toLowerCase().replace(' ', '-')}`}>{project.status}</span>
+                          <span className={`badge-status ${
+                            project.status === 'Terminé' ? 'success' : 
+                            project.status === 'En cours' ? 'warning' : 'info'
+                          }`}>
+                            {project.status}
+                          </span>
                         </td>
                         <td data-label="Date début">
                           <div className="table-date"><Calendar size={12} /> {project.startDate}</div>
@@ -451,7 +560,7 @@ const AdminProjects = () => {
                             <button className="btn-action-edit" title="Modifier" onClick={() => handleEditClick(project)}>
                               <Edit3 size={16} />
                             </button>
-                            <button className="btn-action-delete" title="Supprimer" onClick={() => handleDelete(project.id)}>
+                            <button className="btn-action-delete" title="Supprimer" onClick={() => handleDelete(project.id || project._id)}>
                               <Trash2 size={16} />
                             </button>
                           </div>

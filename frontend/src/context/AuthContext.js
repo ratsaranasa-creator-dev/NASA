@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import axios from 'axios';
 import jwtDecode from 'jwt-decode';
-import { API_URL } from '../apiConfig';
+import api, { API_URL } from '../apiConfig';
 
 const AuthContext = createContext();
 
@@ -17,12 +16,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = useCallback(async (token) => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const { data } = await axios.get(`${API_URL}/api/auth/profile`, config);
+      const { data } = await api.get('/api/auth/profile');
       setUser(data);
     } catch (error) {
       logout();
@@ -52,14 +46,15 @@ export const AuthProvider = ({ children }) => {
   }, [fetchProfile, logout]);
 
   const login = async (email, password) => {
-    const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password });
+    const { data } = await api.post('/api/auth/login', { email, password });
     localStorage.setItem('token', data.token);
     setUser(data);
     return data;
   };
 
   const register = async (userData) => {
-    const { data } = await axios.post(`${API_URL}/api/auth/register`, userData);
+    // Note: userData might be FormData if there's a profile picture
+    const { data } = await api.post('/api/auth/register', userData);
     return data;
   };
 

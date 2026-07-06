@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { Filter, MapPin, Calendar, Users, CheckCircle2, ArrowRight, TrendingUp, Wallet, ChevronRight, ChevronLeft, GraduationCap, Palmtree, X, Building2, Leaf, Heart, BookOpen, Lightbulb, ChevronDown, Mail, Phone, Star, Award } from 'lucide-react';
 import ProjectComments from '../components/ProjectComments';
 import heroImg from '../images/0002.jpg';
@@ -10,7 +10,6 @@ import gallery3 from '../images/0005.jpg';
 import gallery4 from '../images/0006.jpg';
 import gallery5 from '../images/0007.jpg';
 import ctaBg from '../images/0008.jpg';
-import { API_URL } from '../apiConfig';
 import '../styles/ProjectDetailModal.css';
 import '../styles/ProjectPage.css';
 
@@ -84,7 +83,7 @@ const Project = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/projects`);
+        const { data } = await api.get('/api/projects');
         setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);

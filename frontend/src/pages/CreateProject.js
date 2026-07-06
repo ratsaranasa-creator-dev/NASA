@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../apiConfig';
 import { FiArrowLeft, FiCheck } from 'react-icons/fi';
 import ProjectForm from '../components/ProjectForm/ProjectForm';
 import './CreateProject.css';
@@ -10,7 +11,6 @@ export default function CreateProject() {
 
   const handleSubmit = async (formData) => {
     try {
-      const token = localStorage.getItem('token');
       const form = new FormData();
 
       // Ajouter les données du formulaire
@@ -24,15 +24,11 @@ export default function CreateProject() {
         }
       });
 
-      const response = await fetch('/api/projects', {
-        method: 'POST',
+      const response = await api.post('/api/projects', form, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
-        body: form,
       });
-
-      if (!response.ok) throw new Error('Erreur lors de la création du projet');
 
       setSuccessMessage('Projet créé avec succès !');
       setTimeout(() => {

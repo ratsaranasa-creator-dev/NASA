@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { Search, Filter, ArrowUpDown, Check, X, ShieldAlert, CheckCircle2, AlertCircle } from 'lucide-react';
-import { API_URL } from '../apiConfig';
+
 import '../styles/AdminUsers.css';
+import '../styles/AdminProjects.css';
 
 const AdminUsers = ({ onRefreshNotification }) => {
   const [users, setUsers] = useState([]);
@@ -17,9 +18,7 @@ const AdminUsers = ({ onRefreshNotification }) => {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get(`${API_URL}/api/admin/users`, config);
+      const { data } = await api.get('/api/admin/users');
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -44,12 +43,9 @@ const AdminUsers = ({ onRefreshNotification }) => {
   // 3. Status Action Handler (Approve / Reject)
   const handleUpdateStatus = async (userId, newStatus, userFullName) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
-      await axios.put(`${API_URL}/api/admin/citizen-status/${userId}`, {
+      await api.put(`/api/admin/citizen-status/${userId}`, {
         status: newStatus
-      }, config);
+      });
 
       // Update local state list
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
@@ -202,7 +198,10 @@ const AdminUsers = ({ onRefreshNotification }) => {
                       </td>
                       <td className="user-date-cell">{formatDate(user.createdAt)}</td>
                       <td>
-                        <span className={`status-badge-table ${user.status.toLowerCase()}`}>
+                        <span className={`badge-status ${
+                          user.status === 'PENDING' ? 'warning' : 
+                          user.status === 'APPROVED' ? 'success' : 'danger'
+                        }`}>
                           {user.status === 'PENDING' ? 'EN ATTENTE' : user.status === 'APPROVED' ? 'APPROUVÉ' : 'REFUSÉ'}
                         </span>
                       </td>

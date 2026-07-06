@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, Users, Clock, ShieldCheck, Layout, Folder, UserCheck, FileText, Newspaper, MapPin } from 'lucide-react';
 import AdminCMS from '../components/CMS/AdminCMS';
@@ -8,7 +8,6 @@ import AdminDemarches from '../components/AdminDemarches';
 import AdminUsers from '../components/AdminUsers';
 import AdminActualites from '../components/AdminActualites';
 import AdminCulture from '../components/AdminCulture';
-import { API_URL } from '../apiConfig';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('pending');
@@ -31,10 +30,7 @@ const AdminDashboard = () => {
 
   const fetchPendingCitizens = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const { data } = await axios.get(`${API_URL}/api/admin/pending-citizens`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const { data } = await api.get('/api/admin/pending-citizens');
       setPendingCitizens(data);
     } catch (error) {
       console.error('Error fetching citizens:', error);
@@ -45,11 +41,7 @@ const AdminDashboard = () => {
 
   const handleStatusUpdate = async (id, status) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`${API_URL}/api/admin/citizen-status/${id}`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/api/admin/citizen-status/${id}`, { status });
       setPendingCitizens(pendingCitizens.filter(c => c.id !== id));
     } catch (error) {
       alert('Erreur lors de la mise à jour');

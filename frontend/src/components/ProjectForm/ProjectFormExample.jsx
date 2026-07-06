@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiPlus, FiArrowRight } from 'react-icons/fi';
-import ProjectForm from '../ProjectForm/ProjectForm';import { API_URL } from '../../apiConfig';
+import ProjectForm from '../ProjectForm/ProjectForm';
+import api, { API_URL } from '../../apiConfig';
 
 import './ProjectFormExample.css';
 
@@ -22,7 +23,6 @@ export default function ProjectFormExample() {
   const handleFormSubmit = async (formData) => {
     setSubmitStatus('loading');
     try {
-      const token = localStorage.getItem('token');
       const form = new FormData();
 
       // Remplir FormData avec les données du formulaire
@@ -42,19 +42,13 @@ export default function ProjectFormExample() {
       });
 
       // Appeler l'API
-      const response = await fetch(`${API_URL}/api/projects`, {
-        method: 'POST',
+      const response = await api.post('/api/projects', form, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
-        body: form,
       });
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
 
       setSubmitStatus('success');
       console.log('Projet créé:', result);

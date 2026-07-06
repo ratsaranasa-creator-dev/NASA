@@ -17,12 +17,15 @@ exports.getAllProjects = async (req, res) => {
 // @access  Private/Admin
 exports.createProject = async (req, res) => {
   try {
-    const { title, description, location, startDate, endDate, image, category, status } = req.body;
+    const { 
+      title, description, location, startDate, endDate, image, category, status,
+      budget, fullDescription, objectives, timeline, beneficiaries, duration, manager, progress
+    } = req.body;
 
     // Validate required fields
     if (!title || !description || !location || !startDate || !endDate || !image || !category || !status) {
       return res.status(400).json({ 
-        message: 'Toutes les informations (dont la date de début, la date de fin, et l\'image représentative) sont obligatoires.' 
+        message: 'Toutes les informations essentielles sont obligatoires.' 
       });
     }
 
@@ -34,7 +37,15 @@ exports.createProject = async (req, res) => {
       endDate,
       image,
       category,
-      status
+      status,
+      budget,
+      fullDescription,
+      objectives,
+      timeline,
+      beneficiaries,
+      duration,
+      manager,
+      progress
     });
 
     res.status(201).json(newProject);
@@ -49,24 +60,13 @@ exports.createProject = async (req, res) => {
 exports.updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, location, startDate, endDate, image, category, status } = req.body;
+    const updateData = req.body;
 
-    const project = await Project.findById(id);
+    const project = await Project.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+    
     if (!project) {
       return res.status(404).json({ message: 'Projet non trouvé' });
     }
-
-    // Update fields
-    project.title = title || project.title;
-    project.description = description || project.description;
-    project.location = location || project.location;
-    project.startDate = startDate || project.startDate;
-    project.endDate = endDate || project.endDate;
-    project.image = image || project.image;
-    project.category = category || project.category;
-    project.status = status || project.status;
-
-    await project.save();
 
     res.json(project);
   } catch (error) {

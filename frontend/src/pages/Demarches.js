@@ -31,7 +31,11 @@ const Demarches = () => {
 
   const categories = ["Tous", "État Civil", "Identité", "Vie Quotidienne", "Urbanisme"];
 
-  const { demarches } = useDemarches();
+  const { demarches, loading, fetchDemarches } = useDemarches();
+
+  useEffect(() => {
+    fetchDemarches();
+  }, [fetchDemarches]);
 
   const filteredDemarches = useMemo(() => {
     return demarches.filter(d => {
@@ -207,7 +211,14 @@ const Demarches = () => {
                     </a>
                   )}
                   {selectedDemarche.fullContent.downloads?.map((dl, idx) => (
-                    <a key={idx} href={dl.url} className="btn-secondary-action">
+                    <a 
+                      key={idx} 
+                      href={dl.url.startsWith('http') ? dl.url : `${API_URL}${dl.url}`} 
+                      className="btn-secondary-action"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                    >
                       {dl.label} <Download size={18} />
                     </a>
                   ))}

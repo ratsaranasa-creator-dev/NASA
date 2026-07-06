@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api, { API_URL } from '../apiConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Calendar, ArrowRight, X, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
 import bgImage from '../images/01.jpg';
-import { API_URL } from '../apiConfig';
 
 const ALL_CATEGORIES = ["Toutes", "Municipalité", "Travaux", "Événement", "Culture", "Santé"];
 
@@ -35,7 +34,7 @@ const Actualites = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/news`);
+        const { data } = await api.get('/api/news');
         setNews(data);
       } catch (error) {
         console.error('Error fetching news:', error);

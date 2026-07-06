@@ -7,9 +7,23 @@ if (!process.env.REACT_APP_API_URL) {
 const API_URL = process.env.REACT_APP_API_URL || "";
 
 const api = axios.create({
-    baseURL: API_URL
-    // withCredentials: true, // on laisse de côté si pas spécifié avant, mais le user le propose dans son exemple
+    baseURL: API_URL,
+    withCredentials: true
 });
+
+// Add a request interceptor to include the JWT token in the headers
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 export { API_URL };
 export default api;
