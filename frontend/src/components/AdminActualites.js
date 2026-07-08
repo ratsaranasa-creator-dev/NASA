@@ -14,7 +14,7 @@ const AdminActualites = () => {
   const [editingNews, setEditingNews] = useState(null); 
   const [imageFile, setImageFile] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  
   const [validationErrors, setValidationErrors] = useState({});
 
   const fetchNews = useCallback(async () => {
@@ -115,7 +115,7 @@ const AdminActualites = () => {
       return url;
     } catch (error) {
       setUploadingImage(false);
-      setErrorMsg('Erreur lors du téléchargement de l\'image.');
+      console.error('Erreur lors du téléchargement de l\'image.', error);
       return null;
     }
   };

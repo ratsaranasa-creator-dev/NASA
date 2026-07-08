@@ -32,7 +32,7 @@ const Demarches = () => {
 
   const categories = ["Tous", "État Civil", "Identité", "Vie Quotidienne", "Urbanisme"];
 
-  const { demarches, loading, fetchDemarches } = useDemarches();
+  const { demarches, fetchDemarches } = useDemarches();
 
   useEffect(() => {
     fetchDemarches();

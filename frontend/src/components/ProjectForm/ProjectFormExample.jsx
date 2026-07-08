@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiPlus, FiArrowRight } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 import ProjectForm from '../ProjectForm/ProjectForm';
 import api from '../../apiConfig';
 

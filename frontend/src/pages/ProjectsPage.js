@@ -7,10 +7,6 @@ import {
 import api, { API_URL } from '../apiConfig';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ProjectsPage.css';
-import img1 from '../images/001.jpg';
-import img2 from '../images/002.jpg';
-import img3 from '../images/003.jpg';
-import img4 from '../images/004.jpg';
 import heroImg from '../images/13.jpg';
 
 export default function ProjectsPage() {
@@ -20,7 +16,7 @@ export default function ProjectsPage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const { user } = useAuth(); // Get user from auth context
 
   useEffect(() => {

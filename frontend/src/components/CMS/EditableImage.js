@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useCMS } from '../../context/CMSContext';
 import { Upload } from 'lucide-react';
 import { API_URL } from '../../apiConfig';

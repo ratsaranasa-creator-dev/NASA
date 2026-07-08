@@ -24,7 +24,7 @@ export default function CreateProject() {
         }
       });
 
-      const response = await api.post('/api/projects', form);
+      await api.post('/api/projects', form);
 
       setSuccessMessage('Projet créé avec succès !');
       setTimeout(() => {

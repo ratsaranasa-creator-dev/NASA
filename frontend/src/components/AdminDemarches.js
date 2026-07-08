@@ -6,11 +6,10 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDemarches } from '../context/DemarchesContext';
-import { API_URL } from '../apiConfig';
 import '../styles/AdminDemarches.css';
 
 const AdminDemarches = () => {
-  const { demarches, loading, fetchDemarches, addDemarche, updateDemarche, deleteDemarche, uploadFile } = useDemarches();
+  const { demarches, fetchDemarches, addDemarche, updateDemarche, deleteDemarche, uploadFile } = useDemarches();
   const [activeTab, setActiveTab] = useState('list'); 
   const [searchTerm, setSearchTerm] = useState('');
   
