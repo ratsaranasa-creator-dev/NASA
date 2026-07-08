@@ -1,0 +1,367 @@
+{
+  "info": {
+    "_postman_id": "dembeni-backend-api",
+    "name": "Dembéni Backend API - Complete Tests",
+    "description": "Full CRUD tests for Demarches, Projects, News, and Culture\nBase URL: https://dembeni-backend-0soo.onrender.com\nor http://localhost:5000 for local testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🏠 Root & Health",
+      "item": [
+        {
+          "name": "GET Root (Health Check)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📋 Démarches (Public)",
+      "item": [
+        {
+          "name": "GET All Demarches (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches"]
+            },
+            "description": "Get list of published demarches (public)"
+          }
+        },
+        {
+          "name": "GET All Demarches (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches?admin=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches"],
+              "query": [
+                {
+                  "key": "admin",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Get ALL demarches (admin only, no status filter)"
+          }
+        },
+        {
+          "name": "GET Demarche By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches/{id}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches", "{id}"]
+            },
+            "description": "Replace {id} with actual demarche MongoDB ID"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Démarches (Admin)",
+      "item": [
+        {
+          "name": "POST Create Demarche",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"État Civil - Nouveau Service\",\n  \"slug\": \"etat-civil-nouveau\",\n  \"shortDesc\": \"Service de gestion des documents d'état civil\",\n  \"category\": \"État Civil\",\n  \"status\": \"publié\",\n  \"piecesAFournir\": [\"Carte d'identité\", \"Livret de famille\"],\n  \"fullContent\": {\n    \"presentation\": \"Présentation détaillée...\",\n    \"steps\": [\n      {\n        \"title\": \"Étape 1\",\n        \"desc\": \"Description étape 1\"\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches"]
+            }
+          }
+        },
+        {
+          "name": "POST Create Demarche with Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Service avec Image"
+                },
+                {
+                  "key": "category",
+                  "value": "État Civil"
+                },
+                {
+                  "key": "shortDesc",
+                  "value": "Description courte"
+                },
+                {
+                  "key": "status",
+                  "value": "publié"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches"]
+            }
+          }
+        },
+        {
+          "name": "PUT Update Demarche",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"status\": \"brouillon\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches/{id}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches", "{id}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Demarche",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches/{id}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches", "{id}"]
+            }
+          }
+        },
+        {
+          "name": "POST Upload Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/demarches/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "demarches", "upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎯 Projects",
+      "item": [
+        {
+          "name": "GET All Projects (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"]
+            }
+          }
+        },
+        {
+          "name": "GET All Projects (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects?admin=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"],
+              "query": [
+                {
+                  "key": "admin",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Project By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{id}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{id}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📰 News/Actualités",
+      "item": [
+        {
+          "name": "GET All News (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/news",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "news"]
+            }
+          }
+        },
+        {
+          "name": "GET All News (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/news?admin=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "news"],
+              "query": [
+                {
+                  "key": "admin",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎨 Culture",
+      "item": [
+        {
+          "name": "GET All Culture Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/culture",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "culture"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Auth Tests",
+      "item": [
+        {
+          "name": "POST Login (Get Admin Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@dembeni.com\",\n  \"password\": \"your_admin_password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
