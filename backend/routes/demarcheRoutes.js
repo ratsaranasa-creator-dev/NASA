@@ -36,8 +36,9 @@ router.get('/:id', demarcheController.getDemarcheById);
 router.use(protect);
 router.use(admin);
 
-router.post('/', demarcheController.createDemarche);
-router.put('/:id', demarcheController.updateDemarche);
+// Accept file uploads when creating or updating a demarche
+router.post('/', upload.single('file'), demarcheController.createDemarche);
+router.put('/:id', upload.single('file'), demarcheController.updateDemarche);
 router.delete('/:id', demarcheController.deleteDemarche);
 router.post('/upload', upload.single('file'), demarcheController.uploadDocument);
 
