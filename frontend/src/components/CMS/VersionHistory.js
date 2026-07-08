@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api, { API_URL } from '../../apiConfig';
+import api from '../../apiConfig';
 import { History, RotateCcw, X } from 'lucide-react';
 
 const VersionHistory = ({ contentId, onRollback, onClose }) => {

@@ -175,15 +175,19 @@ export default function ProjectsPage() {
     return true;
   });
 
+  const getProjectKey = (project) => project._id || project.id;
+
   const goToPreviousProject = () => {
-    const currentIndex = filtered.findIndex(p => p.id === selectedProject.id);
+    if (!selectedProject) return;
+    const currentIndex = filtered.findIndex(p => getProjectKey(p) === getProjectKey(selectedProject));
     if (currentIndex > 0) {
       setSelectedProject(filtered[currentIndex - 1]);
     }
   };
 
   const goToNextProject = () => {
-    const currentIndex = filtered.findIndex(p => p.id === selectedProject.id);
+    if (!selectedProject) return;
+    const currentIndex = filtered.findIndex(p => getProjectKey(p) === getProjectKey(selectedProject));
     if (currentIndex < filtered.length - 1) {
       setSelectedProject(filtered[currentIndex + 1]);
     }
@@ -292,7 +296,7 @@ export default function ProjectsPage() {
         {filtered.length > 0 ? (
           <div className="projects-grid">
             {filtered.map(p => (
-              <article key={p.id} className="project-card" data-state={p.status}>
+              <article key={getProjectKey(p)} className="project-card" data-state={p.status}>
                 <div className="card-image-wrapper">
                   <div className="card-image" style={{ backgroundImage: `url(${p.image.startsWith('http') ? p.image : `${API_URL}${p.image}`})` }}>
                     <div className="image-overlay"></div>
@@ -519,7 +523,7 @@ export default function ProjectsPage() {
                 {user && user.role === 'ADMIN' && (
                   <div className="detail-actions">
                     <button className="btn-action edit" onClick={() => handleEditProject(selectedProject)}><Edit size={18} /> Modifier</button>
-                    <button className="btn-action delete" onClick={() => handleDeleteProject(selectedProject.id)}><Trash2 size={18} /> Supprimer</button>
+                    <button className="btn-action delete" onClick={() => handleDeleteProject(getProjectKey(selectedProject))}><Trash2 size={18} /> Supprimer</button>
                     <button className="btn-action share" onClick={() => alert('Fonctionnalité de partage à implémenter')}><Share2 size={18} /> Partager</button>
                   </div>
                 )}
@@ -604,10 +608,10 @@ export default function ProjectsPage() {
         <h3>Suivi en images</h3>
         <div className="gallery-row">
           {projects.slice(0, 4).map((p, i) => (
-            <div 
-              key={i} 
-              className="img" 
-              style={{ backgroundImage: `url(${p.image.startsWith('http') ? p.image : `${API_URL}${p.image}`})` }} 
+            <div
+              key={i}
+              className="img"
+              style={{ backgroundImage: `url(${p.image.startsWith('http') ? p.image : `${API_URL}${p.image}`})` }}
             />
           ))}
           {projects.length === 0 && <p>Aucune image disponible.</p>}

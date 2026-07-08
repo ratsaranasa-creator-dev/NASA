@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api, { API_URL } from '../apiConfig';
+import api from '../apiConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { CornerDownRight, Trash2, Send, X, Lock, User, MessageCircle } from 'lucide-react';

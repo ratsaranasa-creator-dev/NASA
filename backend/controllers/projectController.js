@@ -21,7 +21,8 @@ exports.createProject = async (req, res) => {
   try {
     const { 
       title, description, location, startDate, endDate, image, category, status,
-      budget, fullDescription, objectives, timeline, beneficiaries, duration, manager, progress
+      budget, fullDescription, objectives, timeline, beneficiaries, duration, manager, progress,
+      visibilityStatus
     } = req.body;
 
     // Validate required fields
@@ -47,7 +48,8 @@ exports.createProject = async (req, res) => {
       beneficiaries,
       duration,
       manager,
-      progress
+      progress,
+      visibilityStatus
     });
 
     res.status(201).json(newProject);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api, { API_URL } from '../apiConfig';
+import api from '../apiConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, Users, Clock, ShieldCheck, Layout, Folder, UserCheck, FileText, Newspaper, MapPin } from 'lucide-react';
 import AdminCMS from '../components/CMS/AdminCMS';

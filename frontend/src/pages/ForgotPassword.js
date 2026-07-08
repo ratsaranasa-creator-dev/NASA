@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, ArrowRight, AlertCircle, Check, Key } from 'lucide-react';
 import logo from '../images/LOGO.jpg';
-import api, { API_URL } from '../apiConfig';
+import api from '../apiConfig';
 import '../styles/SignupPremium.css';
 
 const ForgotPassword = () => {

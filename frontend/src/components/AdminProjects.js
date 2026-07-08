@@ -35,7 +35,7 @@ const AdminProjects = () => {
 
   const validateField = (name, value) => {
     let errors = { ...validationErrors };
-    
+
     switch (name) {
       case 'title':
         if (!value) errors.title = 'Le titre est obligatoire.';
@@ -63,7 +63,7 @@ const AdminProjects = () => {
       default:
         break;
     }
-    
+
     setValidationErrors(errors);
   };
 
@@ -136,7 +136,7 @@ const AdminProjects = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    
+
     // Final validation
     if (Object.keys(validationErrors).length > 0) {
       toast.error('Veuillez corriger les erreurs avant d\'enregistrer.');
@@ -146,7 +146,7 @@ const AdminProjects = () => {
     let imageUrl = editingProject.image;
     if (imageFile) {
       const uploadedUrl = await handleUpload();
-      if (!uploadedUrl) return; 
+      if (!uploadedUrl) return;
       imageUrl = uploadedUrl;
     }
 
@@ -161,8 +161,8 @@ const AdminProjects = () => {
     };
 
     try {
-      if (editingProject.id) {
-        await api.put(`/api/projects/${editingProject.id}`, payload);
+      if (editingProject.id || editingProject._id) {
+        await api.put(`/api/projects/${editingProject.id || editingProject._id}`, payload);
         toast.success('Projet mis à jour avec succès.');
       } else {
         await api.post('/api/projects', payload);
@@ -466,7 +466,7 @@ const AdminProjects = () => {
                   <div className="media-upload-container">
                     <div className="upload-controls">
                       <label className="btn-modern-upload">
-                        <ImageIcon size={28} /> 
+                        <ImageIcon size={28} />
                         <span>{imageFile ? imageFile.name : (editingProject.image ? 'Changer l\'illustration' : 'Sélectionner une illustration')}</span>
                         <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
                         <span className="upload-hint">JPG, PNG ou WebP (max 5MB)</span>
@@ -477,9 +477,9 @@ const AdminProjects = () => {
                     </div>
                     {editingProject.image && (
                       <div className="modern-image-preview">
-                        <img 
-                          src={editingProject.image.startsWith('http') ? editingProject.image : `${API_URL}${editingProject.image}`} 
-                          alt="Prévisualisation" 
+                        <img
+                          src={editingProject.image.startsWith('http') ? editingProject.image : `${API_URL}${editingProject.image}`}
+                          alt="Prévisualisation"
                         />
                         <div className="image-overlay-info">Aperçu du média actuel</div>
                       </div>
@@ -531,9 +531,9 @@ const AdminProjects = () => {
                       <tr key={project.id || project._id}>
                         <td data-label="Image">
                           <div className="table-img-container">
-                            <img 
-                              src={project.image.startsWith('http') ? project.image : `${API_URL}${project.image}`} 
-                              alt={project.title} 
+                            <img
+                              src={project.image.startsWith('http') ? project.image : `${API_URL}${project.image}`}
+                              alt={project.title}
                             />
                           </div>
                         </td>
@@ -545,15 +545,14 @@ const AdminProjects = () => {
                           <span className="badge badge-category"><Folder size={12} /> {project.category}</span>
                         </td>
                         <td data-label="Avancement">
-                          <span className={`badge-status ${
-                            project.status === 'Terminé' ? 'success' : 
-                            project.status === 'En cours' ? 'warning' : 'info'
-                          }`}>
+                          <span className={`badge-status ${project.status === 'Terminé' ? 'success' :
+                              project.status === 'En cours' ? 'warning' : 'info'
+                            }`}>
                             {project.status}
                           </span>
                         </td>
                         <td data-label="Visibilité">
-                          <button 
+                          <button
                             className={`badge-status ${project.visibilityStatus === 'publié' ? 'success' : 'warning'}`}
                             onClick={() => handleToggleVisibility(project)}
                             style={{ cursor: 'pointer', border: 'none' }}

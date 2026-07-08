@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import api, { API_URL } from '../apiConfig';
+import api from '../apiConfig';
 import { useAuth } from './AuthContext';
 
 const CMSContext = createContext();

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, FileText, Users, Map, 
@@ -10,6 +10,7 @@ import {
 import '../styles/Demarches.css';
 
 import { useDemarches } from '../context/DemarchesContext';
+import { API_URL } from '../apiConfig';
 
 const iconMap = {
   Search, FileText, Users, Map, 

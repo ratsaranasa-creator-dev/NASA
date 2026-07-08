@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { jsPDF } from 'jspdf';
 import { FileDown, Send, FileText, ClipboardList } from 'lucide-react';
-import api, { API_URL } from '../apiConfig';
+import api from '../apiConfig';
 
 
 const CitizenDashboard = () => {
