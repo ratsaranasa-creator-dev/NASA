@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api, { API_URL } from '../apiConfig';
-import { Plus, Edit3, Trash2, MapPin, Calendar, Folder, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Plus, Edit3, Trash2, MapPin, Calendar, Folder, Save, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
 import { toast } from 'react-toastify';
@@ -546,7 +546,7 @@ const AdminProjects = () => {
                         </td>
                         <td data-label="Avancement">
                           <span className={`badge-status ${project.status === 'Terminé' ? 'success' :
-                              project.status === 'En cours' ? 'warning' : 'info'
+                            project.status === 'En cours' ? 'warning' : 'info'
                             }`}>
                             {project.status}
                           </span>

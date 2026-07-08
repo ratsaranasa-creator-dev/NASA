@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Plus, Search, Edit2, Trash2, 
   CheckCircle, Clock, AlertTriangle, 
-  User, Calendar, BarChart3, FileText, X, Save, Upload, Download
+  User, Calendar, BarChart3, FileText, X, Save, Upload
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDemarches } from '../context/DemarchesContext';

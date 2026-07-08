@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api, { API_URL } from '../apiConfig';
-import { Plus, Edit3, Trash2, Save, X, AlertCircle, CheckCircle2, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
+import { Plus, Edit3, Trash2, Save, X, AlertCircle, Image as ImageIcon, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 

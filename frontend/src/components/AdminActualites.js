@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api, { API_URL } from '../apiConfig';
-import { Plus, Edit3, Trash2, Calendar, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2, Newspaper } from 'lucide-react';
+import { Plus, Edit3, Trash2, Calendar, Save, X, Image as ImageIcon, AlertCircle, Newspaper } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
-import { toast } from 'react-toastify';
 
 import '../styles/AdminProjects.css'; // Reusing the same CSS to maintain consistency
 
@@ -16,7 +15,6 @@ const AdminActualites = () => {
   const [imageFile, setImageFile] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
   const fetchNews = useCallback(async () => {
@@ -73,8 +71,6 @@ const AdminActualites = () => {
   const handleEditClick = (newsItem) => {
     setEditingNews(newsItem);
     setImageFile(null);
-    setErrorMsg('');
-    setSuccessMsg('');
     setValidationErrors({});
   };
 
@@ -91,8 +87,6 @@ const AdminActualites = () => {
       status: 'brouillon'
     });
     setImageFile(null);
-    setErrorMsg('');
-    setSuccessMsg('');
     setValidationErrors({});
   };
 
@@ -130,12 +124,8 @@ const AdminActualites = () => {
     e.preventDefault();
     
     if (Object.keys(validationErrors).length > 0) {
-      setErrorMsg('Veuillez corriger les erreurs avant d\'enregistrer.');
       return;
     }
-
-    setErrorMsg('');
-    setSuccessMsg('');
 
     let imageUrl = editingNews.image;
     if (imageFile) {
@@ -145,7 +135,6 @@ const AdminActualites = () => {
     }
 
     if (!editingNews.title || !editingNews.desc || !editingNews.content || !editingNews.date || !imageUrl) {
-      setErrorMsg('Tous les champs obligatoires doivent être remplis.');
       return;
     }
 
@@ -158,10 +147,8 @@ const AdminActualites = () => {
     try {
       if (editingNews.id || editingNews._id) {
         await api.put(`/api/news/${editingNews.id || editingNews._id}`, payload);
-        setSuccessMsg(payload.status === 'publié' ? 'Actualité publiée avec succès.' : 'Actualité mise à jour en tant que brouillon.');
       } else {
         await api.post('/api/news', payload);
-        setSuccessMsg(payload.status === 'publié' ? 'Actualité créée et publiée avec succès.' : 'Actualité enregistrée en tant que brouillon.');
       }
 
       setEditingNews(null);
@@ -169,7 +156,7 @@ const AdminActualites = () => {
       fetchNews();
       window.scrollTo(0, 0);
     } catch (error) {
-      setErrorMsg(error.response?.data?.message || 'Une erreur est survenue lors de l\'enregistrement.');
+      console.error('Error saving news:', error);
     }
   };
 
@@ -177,24 +164,20 @@ const AdminActualites = () => {
     try {
       const newStatus = item.status === 'publié' ? 'brouillon' : 'publié';
       await api.put(`/api/news/${item.id || item._id}`, { ...item, status: newStatus });
-      setSuccessMsg(`Actualité ${newStatus === 'publié' ? 'publiée' : 'mise en brouillon'} avec succès.`);
       fetchNews();
     } catch (error) {
-      setErrorMsg('Erreur lors du changement de statut.');
+      console.error('Error toggling status:', error);
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette actualité ? Cette action est irréversible.')) return;
-    setErrorMsg('');
-    setSuccessMsg('');
 
     try {
       await api.delete(`/api/news/${id}`);
-      setSuccessMsg('Actualité supprimée avec succès.');
       fetchNews();
     } catch (error) {
-      setErrorMsg('Erreur lors de la suppression de l\'actualité.');
+      console.error('Error deleting news:', error);
     }
   };
 
