@@ -1,6 +1,18 @@
 const Demarche = require('../models/Demarche');
 const fs = require('fs');
 const path = require('path');
+const cloudinary = require('../config/cloudinary');
+const streamifier = require('streamifier');
+
+const uploadToCloudinary = (buffer, folder = 'demarches') => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream({ folder }, (error, result) => {
+      if (error) return reject(error);
+      resolve(result);
+    });
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 
 // @desc    Get all demarches
 // @route   GET /api/demarches
@@ -41,11 +53,19 @@ exports.getDemarcheById = async (req, res) => {
 // @access  Private/Admin
 exports.createDemarche = async (req, res) => {
   try {
-    const demarcheData = req.body;
+    const demarcheData = req.body || {};
     
     // Parse nested objects if sent as strings (from FormData)
     if (typeof demarcheData.fullContent === 'string') {
       demarcheData.fullContent = JSON.parse(demarcheData.fullContent);
+    }
+
+    // If a file was uploaded via multer (memoryStorage), send to Cloudinary
+    if (req.file && req.file.buffer) {
+      const result = await uploadToCloudinary(req.file.buffer, 'demarches');
+      demarcheData.image = result.secure_url;
+      demarcheData.imageUrl = result.secure_url;
+      demarcheData.publicId = result.public_id;
     }
 
     const demarche = new Demarche(demarcheData);
@@ -95,17 +115,14 @@ exports.deleteDemarche = async (req, res) => {
     if (!demarche) {
       return res.status(404).json({ message: 'Démarche non trouvée' });
     }
-
-    // Delete associated files if any
-    if (demarche.fullContent && demarche.fullContent.downloads) {
-      demarche.fullContent.downloads.forEach(dl => {
-        if (dl.url && dl.url.startsWith('/uploads/')) {
-          const filePath = path.join(__dirname, '..', dl.url);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        }
-      });
+    // If image stored on Cloudinary, delete it
+    if (demarche.publicId) {
+      try {
+        await cloudinary.uploader.destroy(demarche.publicId);
+      } catch (err) {
+        // Log and continue deletion
+        console.error('Cloudinary deletion error:', err.message || err);
+      }
     }
 
     await Demarche.findByIdAndDelete(req.params.id);
@@ -124,11 +141,13 @@ exports.uploadDocument = async (req, res) => {
       return res.status(400).json({ message: 'Aucun fichier téléchargé' });
     }
 
-    const fileUrl = `/uploads/${req.file.filename}`;
-    res.status(200).json({ 
-      url: fileUrl, 
+    // Upload buffer to Cloudinary
+    const result = await uploadToCloudinary(req.file.buffer, 'demarches');
+    res.status(200).json({
+      url: result.secure_url,
       label: req.file.originalname,
-      filename: req.file.filename 
+      filename: result.public_id,
+      publicId: result.public_id
     });
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors du téléchargement', error: error.message });

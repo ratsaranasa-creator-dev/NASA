@@ -5,15 +5,8 @@ const path = require('path');
 const demarcheController = require('../controllers/demarcheController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
-// Multer Storage Setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, `demarche-${Date.now()}-${file.originalname}`);
-  }
-});
+// Multer Memory Storage (files uploaded to Cloudinary from memory)
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [

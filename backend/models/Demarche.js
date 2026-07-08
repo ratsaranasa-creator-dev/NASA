@@ -6,6 +6,11 @@ const demarcheSchema = new mongoose.Schema({
     required: [true, 'Le titre est obligatoire'],
     trim: true
   },
+  slug: {
+    type: String,
+    index: true,
+    unique: false
+  },
   category: {
     type: String,
     required: [true, 'La catégorie est obligatoire'],
@@ -16,6 +21,16 @@ const demarcheSchema = new mongoose.Schema({
     type: String,
     required: [true, 'La description courte est obligatoire'],
     trim: true
+  },
+  piecesAFournir: [String],
+  image: {
+    type: String
+  },
+  imageUrl: {
+    type: String
+  },
+  publicId: {
+    type: String
   },
   iconName: {
     type: String,
