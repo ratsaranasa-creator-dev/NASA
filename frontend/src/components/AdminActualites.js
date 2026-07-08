@@ -3,6 +3,7 @@ import api, { API_URL } from '../apiConfig';
 import { Plus, Edit3, Trash2, Calendar, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2, Newspaper } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
+import { toast } from 'react-toastify';
 
 import '../styles/AdminProjects.css'; // Reusing the same CSS to maintain consistency
 
@@ -172,14 +173,14 @@ const AdminActualites = () => {
     }
   };
 
-  const handlePublish = async (item) => {
+  const handleToggleStatus = async (item) => {
     try {
-      await api.put(`/api/news/${item.id || item._id}`, { ...item, status: 'publié' });
-      setSuccessMsg('Actualité publiée avec succès.');
+      const newStatus = item.status === 'publié' ? 'brouillon' : 'publié';
+      await api.put(`/api/news/${item.id || item._id}`, { ...item, status: newStatus });
+      setSuccessMsg(`Actualité ${newStatus === 'publié' ? 'publiée' : 'mise en brouillon'} avec succès.`);
       fetchNews();
-      window.scrollTo(0, 0);
     } catch (error) {
-      setErrorMsg('Erreur lors de la publication de l\'actualité.');
+      setErrorMsg('Erreur lors du changement de statut.');
     }
   };
 
@@ -213,17 +214,6 @@ const AdminActualites = () => {
           <button className="btn-add-project" onClick={handleCreateClick}>
             <Plus size={18} /> Nouvelle Actualité
           </button>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="alert alert-success">
-          <CheckCircle2 size={20} /> {successMsg}
-        </div>
-      )}
-      {errorMsg && (
-        <div className="alert alert-danger">
-          <AlertCircle size={20} /> {errorMsg}
         </div>
       )}
 
@@ -419,20 +409,20 @@ const AdminActualites = () => {
                           <span className="badge badge-category">{item.category}</span>
                         </td>
                         <td data-label="Statut">
-                          <span className={`badge-status ${item.status === 'publié' ? 'success' : 'warning'}`}>
+                          <button 
+                            className={`badge-status ${item.status === 'publié' ? 'success' : 'warning'}`}
+                            onClick={() => handleToggleStatus(item)}
+                            style={{ cursor: 'pointer', border: 'none' }}
+                            title="Cliquez pour changer la visibilité"
+                          >
                             {item.status === 'publié' ? 'Publié' : 'Brouillon'}
-                          </span>
+                          </button>
                         </td>
                         <td data-label="Date">
                           <div className="table-date"><Calendar size={12} /> {item.date}</div>
                         </td>
                         <td data-label="Actions">
                           <div className="action-buttons">
-                            {item.status !== 'publié' && (
-                              <button className="btn-action-publish" title="Publier maintenant" onClick={() => handlePublish(item)}>
-                                <CheckCircle2 size={16} />
-                              </button>
-                            )}
                             <button className="btn-action-edit" title="Modifier" onClick={() => handleEditClick(item)}>
                               <Edit3 size={16} />
                             </button>

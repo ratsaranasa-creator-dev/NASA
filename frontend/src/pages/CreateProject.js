@@ -24,11 +24,7 @@ export default function CreateProject() {
         }
       });
 
-      const response = await api.post('/api/projects', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await api.post('/api/projects', form);
 
       setSuccessMessage('Projet créé avec succès !');
       setTimeout(() => {

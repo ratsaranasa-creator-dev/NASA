@@ -66,6 +66,11 @@ const projectSchema = new mongoose.Schema({
   progress: {
     type: Number,
     default: 0
+  },
+  visibilityStatus: {
+    type: String,
+    enum: ['brouillon', 'publié'],
+    default: 'publié'
   }
 }, {
   timestamps: true,

@@ -35,9 +35,10 @@ const cultureSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  actif: {
-    type: Boolean,
-    default: true,
+  status: {
+    type: String,
+    enum: ['brouillon', 'publié'],
+    default: 'publié',
   }
 }, {
   timestamps: true,

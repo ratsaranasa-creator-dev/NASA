@@ -30,7 +30,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      await api.post(`${API_URL}/api/auth/forgot-password`, { email });
+      await api.post('/api/auth/forgot-password', { email });
       setMessage('Si votre adresse e-mail est enregistrée, un lien de réinitialisation vous a été envoyé.');
       setEmail('');
     } catch (err) {

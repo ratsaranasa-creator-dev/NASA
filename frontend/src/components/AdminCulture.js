@@ -19,7 +19,7 @@ const AdminCulture = () => {
   const fetchStructures = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/culture');
+      const { data } = await api.get('/api/culture?admin=true');
       setStructures(data);
     } catch (error) {
       console.error('Error fetching structures:', error);
@@ -81,7 +81,7 @@ const AdminCulture = () => {
       modalite_acces: '',
       icone: 'MapPin',
       image: '',
-      actif: true
+      status: 'publié'
     });
     setImageFile(null);
     setPreviewUrl(null);
@@ -136,11 +136,7 @@ const AdminCulture = () => {
         const formData = new FormData();
         formData.append('image', imageFile);
         try {
-          const uploadRes = await api.post('/api/culture/upload', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+          const uploadRes = await api.post('/api/culture/upload', formData);
           imageUrl = uploadRes.data.url;
         } catch (uploadError) {
           console.error('Image upload error:', uploadError.response?.data || uploadError.message);
@@ -305,16 +301,16 @@ const AdminCulture = () => {
                     {validationErrors.horaires && <span className="error-text">{validationErrors.horaires}</span>}
                   </div>
                   
-                  <div className="form-group checkbox-group">
-                    <label className="checkbox-label" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginTop: '10px' }}>
-                      <input
-                        type="checkbox"
-                        checked={editingStructure.actif}
-                        onChange={(e) => handleInputChange('actif', e.target.checked)}
-                        style={{ marginRight: '10px', width: '18px', height: '18px' }}
-                      />
-                      <span>Visible sur le site public</span>
-                    </label>
+                  <div className="form-group">
+                    <label>STATUT DE PUBLICATION *</label>
+                    <select
+                      value={editingStructure.status || 'brouillon'}
+                      onChange={(e) => handleInputChange('status', e.target.value)}
+                      className="status-select"
+                    >
+                      <option value="brouillon">Brouillon (Masqué)</option>
+                      <option value="publié">Publié (Visible)</option>
+                    </select>
                   </div>
                 </div>
 
@@ -379,7 +375,7 @@ const AdminCulture = () => {
                   </thead>
                   <tbody>
                     {structures.map((item) => (
-                      <tr key={item.id || item._id} className={!item.actif ? 'row-inactive' : ''}>
+                      <tr key={item.id || item._id} className={item.status === 'brouillon' ? 'row-inactive' : ''}>
                         <td data-label="Image">
                           <div className="table-img-container">
                             {item.image ? (
@@ -403,11 +399,11 @@ const AdminCulture = () => {
                         <td data-label="Statut">
                           <button 
                             onClick={() => handleToggleActive(item)}
-                            className={`badge-status ${item.actif ? 'success' : 'danger'}`}
+                            className={`badge-status ${item.status === 'publié' ? 'success' : 'warning'}`}
                             style={{ cursor: 'pointer', border: 'none', padding: '5px 10px', borderRadius: '4px' }}
                             title="Cliquez pour changer la visibilité"
                           >
-                            {item.actif ? 'Visible' : 'Masqué'}
+                            {item.status === 'publié' ? 'Publié' : 'Brouillon'}
                           </button>
                         </td>
                         <td data-label="Actions">

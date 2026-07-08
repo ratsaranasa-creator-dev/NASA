@@ -27,9 +27,7 @@ const Culture = () => {
     const fetchStructures = async () => {
       try {
         const { data } = await api.get('/api/culture');
-        // Filter only active structures for the public page
-        const activeStructures = data.filter(item => item.actif);
-        setStructures(activeStructures);
+        setStructures(data);
       } catch (error) {
         console.error('Error fetching structures:', error);
       } finally {

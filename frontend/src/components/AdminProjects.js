@@ -3,6 +3,7 @@ import api, { API_URL } from '../apiConfig';
 import { Plus, Edit3, Trash2, MapPin, Calendar, Folder, Save, X, Image as ImageIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCMS } from '../context/CMSContext';
+import { toast } from 'react-toastify';
 
 import '../styles/AdminProjects.css';
 
@@ -14,14 +15,12 @@ const AdminProjects = () => {
   const [editingProject, setEditingProject] = useState(null); // holds project to create or edit
   const [imageFile, setImageFile] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/projects');
+      const { data } = await api.get('/api/projects?admin=true');
       setProjects(data);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -76,8 +75,6 @@ const AdminProjects = () => {
   const handleEditClick = (project) => {
     setEditingProject(project);
     setImageFile(null);
-    setErrorMsg('');
-    setSuccessMsg('');
     setValidationErrors({});
   };
 
@@ -98,12 +95,12 @@ const AdminProjects = () => {
       beneficiaries: '',
       duration: '',
       manager: '',
-      progress: 0
+      progress: 0,
+      visibilityStatus: 'brouillon'
     });
     setImageFile(null);
-    setErrorMsg('');
-    setSuccessMsg('');
     setValidationErrors({});
+    window.scrollTo(0, 0);
   };
 
   const handleFileChange = (e) => {
@@ -132,7 +129,7 @@ const AdminProjects = () => {
       return url;
     } catch (error) {
       setUploadingImage(false);
-      setErrorMsg('Erreur lors du téléchargement de l\'image.');
+      toast.error('Erreur lors du téléchargement de l\'image.');
       return null;
     }
   };
@@ -142,12 +139,9 @@ const AdminProjects = () => {
     
     // Final validation
     if (Object.keys(validationErrors).length > 0) {
-      setErrorMsg('Veuillez corriger les erreurs avant d\'enregistrer.');
+      toast.error('Veuillez corriger les erreurs avant d\'enregistrer.');
       return;
     }
-
-    setErrorMsg('');
-    setSuccessMsg('');
 
     let imageUrl = editingProject.image;
     if (imageFile) {
@@ -157,7 +151,7 @@ const AdminProjects = () => {
     }
 
     if (!editingProject.title || !editingProject.description || !editingProject.location || !editingProject.startDate || !editingProject.endDate || !imageUrl) {
-      setErrorMsg('Tous les champs obligatoires doivent être remplis.');
+      toast.error('Tous les champs obligatoires doivent être remplis.');
       return;
     }
 
@@ -169,10 +163,10 @@ const AdminProjects = () => {
     try {
       if (editingProject.id) {
         await api.put(`/api/projects/${editingProject.id}`, payload);
-        setSuccessMsg('Projet mis à jour avec succès.');
+        toast.success('Projet mis à jour avec succès.');
       } else {
         await api.post('/api/projects', payload);
-        setSuccessMsg('Projet créé et publié avec succès.');
+        toast.success('Projet créé et publié avec succès.');
       }
 
       setEditingProject(null);
@@ -180,21 +174,30 @@ const AdminProjects = () => {
       fetchProjects();
       window.scrollTo(0, 0);
     } catch (error) {
-      setErrorMsg(error.response?.data?.message || 'Une erreur est survenue lors de l\'enregistrement.');
+      toast.error(error.response?.data?.message || 'Une erreur est survenue lors de l\'enregistrement.');
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.')) return;
-    setErrorMsg('');
-    setSuccessMsg('');
 
     try {
       await api.delete(`/api/projects/${id}`);
-      setSuccessMsg('Projet supprimé avec succès.');
+      toast.success('Projet supprimé avec succès.');
       fetchProjects();
     } catch (error) {
-      setErrorMsg('Erreur lors de la suppression du projet.');
+      toast.error('Erreur lors de la suppression du projet.');
+    }
+  };
+
+  const handleToggleVisibility = async (project) => {
+    try {
+      const newStatus = project.visibilityStatus === 'publié' ? 'brouillon' : 'publié';
+      await api.put(`/api/projects/${project.id || project._id}`, { visibilityStatus: newStatus });
+      toast.success(`Projet ${newStatus === 'publié' ? 'publié' : 'mis en brouillon'} avec succès.`);
+      fetchProjects();
+    } catch (error) {
+      toast.error('Erreur lors du changement de visibilité.');
     }
   };
 
@@ -214,17 +217,6 @@ const AdminProjects = () => {
           <button className="btn-add-project" onClick={handleCreateClick}>
             <Plus size={18} /> Nouveau Projet
           </button>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="alert alert-success">
-          <CheckCircle2 size={20} /> {successMsg}
-        </div>
-      )}
-      {errorMsg && (
-        <div className="alert alert-danger">
-          <AlertCircle size={20} /> {errorMsg}
         </div>
       )}
 
@@ -443,6 +435,18 @@ const AdminProjects = () => {
                     </div>
 
                     <div className="form-group">
+                      <label>STATUT DE PUBLICATION *</label>
+                      <select
+                        value={editingProject.visibilityStatus || 'brouillon'}
+                        onChange={(e) => handleInputChange('visibilityStatus', e.target.value)}
+                        className="status-select"
+                      >
+                        <option value="brouillon">Brouillon (Masqué)</option>
+                        <option value="publié">Publié (Visible)</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
                       <label>PROGRESSION (%) : {editingProject.progress || 0}%</label>
                       <input
                         type="range"
@@ -517,9 +521,8 @@ const AdminProjects = () => {
                       <th>Image</th>
                       <th>Titre</th>
                       <th>Catégorie</th>
-                      <th>Statut</th>
-                      <th>Date début</th>
-                      <th>Date fin</th>
+                      <th>Avancement</th>
+                      <th>Visibilité</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -541,7 +544,7 @@ const AdminProjects = () => {
                         <td data-label="Catégorie">
                           <span className="badge badge-category"><Folder size={12} /> {project.category}</span>
                         </td>
-                        <td data-label="Statut">
+                        <td data-label="Avancement">
                           <span className={`badge-status ${
                             project.status === 'Terminé' ? 'success' : 
                             project.status === 'En cours' ? 'warning' : 'info'
@@ -549,11 +552,14 @@ const AdminProjects = () => {
                             {project.status}
                           </span>
                         </td>
-                        <td data-label="Date début">
-                          <div className="table-date"><Calendar size={12} /> {project.startDate}</div>
-                        </td>
-                        <td data-label="Date fin">
-                          <div className="table-date"><Calendar size={12} /> {project.endDate}</div>
+                        <td data-label="Visibilité">
+                          <button 
+                            className={`badge-status ${project.visibilityStatus === 'publié' ? 'success' : 'warning'}`}
+                            onClick={() => handleToggleVisibility(project)}
+                            style={{ cursor: 'pointer', border: 'none' }}
+                          >
+                            {project.visibilityStatus === 'publié' ? 'Publié' : 'Brouillon'}
+                          </button>
                         </td>
                         <td data-label="Actions">
                           <div className="action-buttons">

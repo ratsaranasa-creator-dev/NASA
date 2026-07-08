@@ -55,11 +55,7 @@ export const CMSProvider = ({ children }) => {
     formData.append('image', file);
 
     try {
-      const { data } = await api.post('/api/pages/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const { data } = await api.post('/api/pages/upload', formData);
       return data.url;
     } catch (error) {
       console.error('Error uploading image:', error);

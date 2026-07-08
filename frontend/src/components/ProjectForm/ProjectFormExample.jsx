@@ -42,11 +42,7 @@ export default function ProjectFormExample() {
       });
 
       // Appeler l'API
-      const response = await api.post('/api/projects', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await api.post('/api/projects', form);
 
       const result = response.data;
 

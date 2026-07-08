@@ -5,7 +5,9 @@ const Project = require('../models/Project');
 // @access  Public
 exports.getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().sort({ createdAt: -1 });
+    const isAdmin = req.query.admin === 'true';
+    const query = isAdmin ? {} : { visibilityStatus: 'publié' };
+    const projects = await Project.find(query).sort({ createdAt: -1 });
     res.json(projects);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération des projets', error: error.message });

@@ -89,7 +89,7 @@ const Demarches = () => {
           <AnimatePresence>
             {filteredDemarches.map(demarche => (
               <motion.div
-                key={demarche.id}
+                key={demarche._id || demarche.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

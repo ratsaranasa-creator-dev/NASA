@@ -33,7 +33,9 @@ exports.createStructure = async (req, res) => {
 
 exports.getStructures = async (req, res) => {
   try {
-    const structures = await Culture.find().sort({ createdAt: -1 });
+    const isAdmin = req.query.admin === 'true';
+    const query = isAdmin ? {} : { status: 'publié' };
+    const structures = await Culture.find(query).sort({ createdAt: -1 });
     res.status(200).json(structures);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération des structures', error: error.message });

@@ -64,9 +64,7 @@ export const DemarchesProvider = ({ children }) => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const { data } = await api.post('/api/demarches/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const { data } = await api.post('/api/demarches/upload', formData);
       return data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Erreur lors du téléchargement');

@@ -42,14 +42,64 @@ const AdminDemarches = () => {
     fetchDemarches(true);
   }, [fetchDemarches]);
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (item) => {
+    const status = item.status;
+    const handleToggle = async (e) => {
+      e.stopPropagation();
+      const newStatus = status === 'publié' ? 'brouillon' : 'publié';
+      try {
+        await updateDemarche(item._id || item.id, { ...item, status: newStatus });
+      } catch (err) {
+        console.error("Erreur toggle status:", err);
+      }
+    };
+
     switch (status) {
       case "À jour":
-      case "publié": return <span className="badge-status success">Publié</span>;
+      case "publié": 
+        return (
+          <span 
+            className="badge-status success" 
+            onClick={handleToggle} 
+            style={{ cursor: 'pointer' }}
+            title="Cliquez pour passer en brouillon"
+          >
+            Publié
+          </span>
+        );
       case "En révision":
-      case "brouillon": return <span className="badge-status warning">Brouillon</span>;
-      case "Obsolète": return <span className="badge-status danger">Obsolète</span>;
-      default: return <span className="badge-status info">{status}</span>;
+      case "brouillon": 
+        return (
+          <span 
+            className="badge-status warning" 
+            onClick={handleToggle} 
+            style={{ cursor: 'pointer' }}
+            title="Cliquez pour publier"
+          >
+            Brouillon
+          </span>
+        );
+      case "Obsolète": 
+        return (
+          <span 
+            className="badge-status danger" 
+            onClick={handleToggle}
+            style={{ cursor: 'pointer' }}
+            title="Cliquez pour publier"
+          >
+            Obsolète
+          </span>
+        );
+      default: 
+        return (
+          <span 
+            className="badge-status info" 
+            onClick={handleToggle}
+            style={{ cursor: 'pointer' }}
+          >
+            {status}
+          </span>
+        );
     }
   };
 
@@ -207,7 +257,7 @@ const AdminDemarches = () => {
                 <AnimatePresence>
                   {filteredDemarches.length > 0 ? filteredDemarches.map(item => (
                     <motion.tr 
-                      key={item.id}
+                      key={item._id || item.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0, x: -20 }}
@@ -219,7 +269,7 @@ const AdminDemarches = () => {
                           <span>{item.category}</span>
                         </div>
                       </td>
-                      <td>{getStatusBadge(item.status)}</td>
+                      <td>{getStatusBadge(item)}</td>
                       <td>
                         <div className="assignee">
                           <User size={14} /> {item.assignedTo || 'Non assigné'}
@@ -227,7 +277,7 @@ const AdminDemarches = () => {
                       </td>
                       <td>
                         <div className="deadline">
-                          <Calendar size={14} /> {item.deadline || 'Aucune'}
+                          <Calendar size={14} /> {item.deadline ? new Date(item.deadline).toLocaleDateString('fr-FR') : 'Aucune'}
                         </div>
                       </td>
                       <td>
@@ -243,7 +293,7 @@ const AdminDemarches = () => {
                           <button className="btn-icon" title="Modifier" onClick={() => openEditModal(item)}>
                             <Edit2 size={16} />
                           </button>
-                          <button className="btn-icon red" title="Supprimer" onClick={() => handleDelete(item.id)}>
+                          <button className="btn-icon red" title="Supprimer" onClick={() => handleDelete(item._id || item.id)}>
                             <Trash2 size={16} />
                           </button>
                         </div>
